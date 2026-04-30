@@ -8,7 +8,7 @@ import matplotlib.pyplot as plt
 from netCDF4 import Dataset
 from scipy.interpolate import griddata
 
-from spectra_core import SpectraCore
+from .spectra_core import SpectraCore
 
 
 # ---------------------------------------------------------
