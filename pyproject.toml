@@ -1,0 +1,27 @@
+[build-system]
+requires = ["setuptools>=61", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "ufs_da_diagnostics"
+version = "0.1.0"
+description = "Unified FV3-JEDI diagnostics and plotting tools"
+readme = "README.md"
+requires-python = ">=3.9"
+license = {text = "MIT"}
+authors = [{name="Jong Kim"}]
+
+dependencies = [
+    "numpy",
+    "matplotlib",
+    "cartopy",
+    "xarray",
+    "netCDF4",
+    "pyyaml",
+]
+
+[tool.setuptools]
+package-dir = {"" = "."}
+
+[tool.setuptools.packages.find]
+where = ["."]
