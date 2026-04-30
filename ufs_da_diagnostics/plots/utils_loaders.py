@@ -108,3 +108,10 @@ def load_oma_explicit(f, varname):
         return None
 
     return to_numeric_safe(obs - hofx)
+
+
+# Backward compatibility
+load_qc_any = load_qc_universal
+load_omb_any = load_omb
+load_oma_any = load_oma_explicit
+load_obs_any = load_obsvalue
