@@ -5,7 +5,7 @@ import yaml
 import os
 
 from .spectra_core import SpectraCore
-from plots import SpectraPlotter
+from ..plots import SpectraPlotter
 
 
 def main():
