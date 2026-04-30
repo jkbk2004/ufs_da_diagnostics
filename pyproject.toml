@@ -25,3 +25,9 @@ package-dir = {"" = "."}
 
 [tool.setuptools.packages.find]
 where = ["."]
+
+[project.scripts]
+ufsda-spectra-inc = "ufs_da_diagnostics.spectra.spectra_analysis_tiles:main"
+ufsda-spectra-bkg-inc = "ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc:main"
+ufsda-inc-maps = "ufs_da_diagnostics.increment.increment_maps_tiles:main"
+ufsda-obs-diag = "ufs_da_diagnostics.obs.obs_diagnostic:main"
