@@ -4,7 +4,7 @@ import argparse
 import yaml
 import os
 
-from spectra_core import SpectraCore
+from .spectra_core import SpectraCore
 from plots import SpectraPlotter
 
 
