@@ -5,7 +5,7 @@ import sys
 sys.path.insert(0, os.path.abspath(".."))
 
 project = "UFS-DA-diagnostics"
-author = "Jonggyun Kim"
+author = "Jong Kim"
 
 extensions = [
     "sphinx.ext.autodoc",
