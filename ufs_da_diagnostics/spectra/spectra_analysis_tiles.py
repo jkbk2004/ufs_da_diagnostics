@@ -5,8 +5,7 @@ import yaml
 import os
 
 from .spectra_core import SpectraCore
-from ..plots import SpectraPlotter
-
+from ..plots.spectra_plots import SpectraPlotter
 
 def main():
     parser = argparse.ArgumentParser(description="FV3-JEDI Spectral Diagnostics (Tiles → Lat/Lon)")
