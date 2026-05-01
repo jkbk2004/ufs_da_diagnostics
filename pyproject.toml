@@ -32,3 +32,6 @@ ufsda-spectra-bkg-inc = "ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc:mai
 ufsda-inc-maps = "ufs_da_diagnostics.increment.increment_maps_tiles:main"
 ufsda-obs-diag = "ufs_da_diagnostics.obs.obs_diagnostic:main"
 ufsda-jedi-log = "ufs_da_diagnostics.log.parse_jedi_log:main"
+
+[tool.setuptools.package-data]
+ufs_da_diagnostics = ["examples/*.yaml"]
