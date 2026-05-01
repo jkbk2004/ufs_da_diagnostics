@@ -1,4 +1,21 @@
-#!/usr/bin/env python3
+"""
+Increment Maps Diagnostics (FV3-JEDI)
+
+This module generates horizontal increment maps and zonal-mean diagnostics
+from FV3-JEDI analysis increment files stored on the native 6‑tile
+cubed‑sphere grid. It supports:
+
+- Single‑experiment increment maps
+- Two‑experiment CTRL–EXP–DIFF comparison maps
+- Zonal‑mean (latitude × level) diagnostics
+- YAML‑driven configuration
+- Command‑line execution via ``ufsda-inc-maps``
+
+All functions operate on FV3 native tile files of the form:
+    prefix.tile1.nc ... prefix.tile6.nc
+
+Outputs are written as PNG figures to the configured output directory.
+"""
 
 import yaml
 import numpy as np
@@ -14,6 +31,25 @@ import sys
 # Load FV3 tile increment
 # ---------------------------------------------------------
 def load_tile(prefix, tile, var, level):
+    """Load a single FV3 cubed‑sphere tile increment field.
+
+    Parameters
+    ----------
+    prefix : str
+        Path prefix to the increment tile files (e.g.,
+        ``/path/to/atminc.cubed_sphere_grid.tile``).
+    tile : int
+        Tile number (1–6).
+    var : str
+        Variable name (e.g., ``T_inc``, ``u_inc``).
+    level : int
+        Vertical level index (0–126).
+
+    Returns
+    -------
+    np.ndarray
+        2D increment field for the specified tile and level.
+    """
     path = f"{prefix}{tile}.nc"
     with Dataset(path) as nc:
         data = nc[var][0, level, :, :]
@@ -23,6 +59,22 @@ def load_tile(prefix, tile, var, level):
 # Load FV3 grid tile (corner → center)
 # ---------------------------------------------------------
 def load_grid(grid_prefix, tile):
+    """Load FV3 grid tile and compute cell‑centered lat/lon.
+
+    Parameters
+    ----------
+    grid_prefix : str
+        Path prefix to FV3 grid files (e.g., ``C96_grid.tile``).
+    tile : int
+        Tile number (1–6).
+
+    Returns
+    -------
+    lon_c : np.ndarray
+        2D longitude array (cell‑centered), wrapped to [-180, 180].
+    lat_c : np.ndarray
+        2D latitude array (cell‑centered).
+    """
     path = f"{grid_prefix}{tile}.nc"
     with Dataset(path) as nc:
         lon = nc["x"][:]
@@ -42,7 +94,7 @@ def load_grid(grid_prefix, tile):
     return lon_c, lat_c
 
 # ---------------------------------------------------------
-# FV3 127-level pressure grid (mbar)
+# FV3 127‑level pressure grid (mbar)
 # ---------------------------------------------------------
 PFULL_MBAR = np.array([
     0,0,0,0,0,0,0,0,0,0,0,0,0,
@@ -58,12 +110,50 @@ PFULL_MBAR = np.array([
 ])
 
 def load_pressure(level):
+    """Return pressure (mbar) for a given FV3 vertical level.
+
+    Parameters
+    ----------
+    level : int
+        Vertical level index (0–126).
+
+    Returns
+    -------
+    float
+        Pressure in mbar.
+    """
     return float(PFULL_MBAR[level])
 
 # ---------------------------------------------------------
 # Build global lat/lon field from 6 tiles
 # ---------------------------------------------------------
 def build_global(prefix, grid_prefix, var, level):
+    """Build a global lat/lon increment field from 6 FV3 tiles.
+
+    Parameters
+    ----------
+    prefix : str
+        Path prefix to increment tile files.
+    grid_prefix : str
+        Path prefix to FV3 grid files.
+    var : str
+        Variable name.
+    level : int
+        Vertical level index.
+
+    Returns
+    -------
+    Lon : np.ndarray
+        2D longitude array (181 × 360).
+    Lat : np.ndarray
+        2D latitude array (181 × 360).
+    field_interp : np.ndarray
+        Interpolated increment field on the global lat/lon grid.
+
+    Notes
+    -----
+    Uses nearest‑neighbor interpolation via ``scipy.interpolate.griddata``.
+    """
     fields = []
     lons = []
     lats = []
@@ -95,6 +185,31 @@ def build_global(prefix, grid_prefix, var, level):
 # Compute zonal mean for all 127 levels
 # ---------------------------------------------------------
 def compute_zonal_mean_full(prefix, grid_prefix, var):
+    """Compute full vertical zonal‑mean cross‑section for a variable.
+
+    Parameters
+    ----------
+    prefix : str
+        Path prefix to increment tile files.
+    grid_prefix : str
+        Path prefix to FV3 grid files.
+    var : str
+        Variable name.
+
+    Returns
+    -------
+    zm : np.ndarray
+        2D array of shape (127 levels × 181 latitudes).
+    lat_new : np.ndarray
+        Latitude array (181).
+    PFULL_MBAR : np.ndarray
+        Pressure levels (mbar) for all 127 FV3 levels.
+
+    Notes
+    -----
+    Zonal mean is computed as the mean over longitude after interpolation
+    to a global lat/lon grid.
+    """
     nlev = len(PFULL_MBAR)
     lat_new = np.linspace(-90, 90, 181)
     zm = np.zeros((nlev, len(lat_new)))
@@ -104,6 +219,7 @@ def compute_zonal_mean_full(prefix, grid_prefix, var):
         zm[lev, :] = np.nanmean(field, axis=1)
 
     return zm, lat_new, PFULL_MBAR
+
 # ---------------------------------------------------------
 # Contrast settings for T/u/v
 # ---------------------------------------------------------
@@ -116,12 +232,32 @@ DIFF_VMAX = 1.0
 # Humidity-specific ranges (WIDER → less colorful)
 # ---------------------------------------------------------
 def get_map_limits(var, is_diff=False):
+    """Return colorbar limits for increment maps.
+
+    Parameters
+    ----------
+    var : str
+        Variable name (e.g., ``T_inc``, ``sphum_inc``).
+    is_diff : bool, optional
+        Whether the field is a DIFF field (EXP − CTRL).
+
+    Returns
+    -------
+    (vmin, vmax) : tuple of float
+        Recommended colorbar limits for the variable.
+
+    Notes
+    -----
+    Humidity increments typically have much smaller magnitudes than
+    temperature or wind increments, so wider ranges are used to avoid
+    oversaturation of the color scale.
+    """
     v = var.lower()
     if "sphum" in v or "qv" in v or "q_inc" in v:
         if is_diff:
-            return -4e-4, 4e-4     # wider → softer colors
+            return -4e-4, 4e-4
         else:
-            return -1.5e-3, 1.5e-3 # wider → softer colors
+            return -1.5e-3, 1.5e-3
     else:
         return (DIFF_VMIN, DIFF_VMAX) if is_diff else (MAP_VMIN, MAP_VMAX)
 
@@ -129,7 +265,30 @@ def get_map_limits(var, is_diff=False):
 # Tapered horizontal colorbar helper
 # ---------------------------------------------------------
 def tapered_colorbar(fig, im, ax, label=None):
-    # Create colorbar
+    """Create a tapered horizontal colorbar with adjusted layout.
+
+    Parameters
+    ----------
+    fig : matplotlib.figure.Figure
+        Figure object.
+    im : matplotlib.image.AxesImage
+        Image returned by ``pcolormesh``.
+    ax : matplotlib.axes.Axes
+        Axes to which the colorbar is attached.
+    label : str, optional
+        Colorbar label.
+
+    Returns
+    -------
+    matplotlib.colorbar.Colorbar
+        The created colorbar instance.
+
+    Notes
+    -----
+    The function adjusts the colorbar position upward to avoid overlap
+    with titles and axes labels. Power limits are set to improve
+    readability for small‑magnitude increments.
+    """
     cbar = fig.colorbar(
         im, ax=ax,
         orientation="horizontal",
@@ -141,10 +300,10 @@ def tapered_colorbar(fig, im, ax, label=None):
 
     pos = cbar.ax.get_position()
     cbar.ax.set_position([
-        pos.x0,          # left
-        pos.y0 + 0.03,   # bottom (move up by +0.03)
-        pos.width,       # width
-        pos.height       # height
+        pos.x0,
+        pos.y0 + 0.03,
+        pos.width,
+        pos.height
     ])
     
     if label:
@@ -153,15 +312,39 @@ def tapered_colorbar(fig, im, ax, label=None):
     cbar.formatter.set_powerlimits((-2, 2))
     cbar.update_ticks()
 
-    # --- CRITICAL: force layout BEFORE adding taper ---
     fig.canvas.draw()
-
     return cbar
 
 # ---------------------------------------------------------
 # Plot 1‑panel increment map
 # ---------------------------------------------------------
 def plot_single(Lon, Lat, field, var, lev, exp_name, prefix, outname):
+    """Plot a single global increment map for one experiment.
+
+    Parameters
+    ----------
+    Lon : np.ndarray
+        2D longitude array (lat × lon).
+    Lat : np.ndarray
+        2D latitude array (lat × lon).
+    field : np.ndarray
+        2D increment field interpolated to lat/lon.
+    var : str
+        Variable name.
+    lev : int
+        Vertical level index.
+    exp_name : str
+        Experiment name.
+    prefix : str
+        Path prefix to tile files (unused in plotting but included for metadata).
+    outname : str
+        Output PNG filename.
+
+    Notes
+    -----
+    The plot uses a PlateCarree projection with coastlines and land shading.
+    Colorbar limits are determined by ``get_map_limits``.
+    """
     pressure = load_pressure(lev)
     title = f"{var} – Level {lev} ({pressure:.1f} mbar) – {exp_name}"
 
@@ -189,6 +372,35 @@ def plot_single(Lon, Lat, field, var, lev, exp_name, prefix, outname):
 # Plot 3‑panel increment map
 # ---------------------------------------------------------
 def plot_three(Lon, Lat, ctrl, exp, var, lev, ctrl_name, exp_name, outname):
+    """Plot CTRL, EXP, and DIFF (EXP − CTRL) increment maps.
+
+    Parameters
+    ----------
+    Lon : np.ndarray
+        2D longitude array.
+    Lat : np.ndarray
+        2D latitude array.
+    ctrl : np.ndarray
+        CTRL increment field.
+    exp : np.ndarray
+        EXP increment field.
+    var : str
+        Variable name.
+    lev : int
+        Vertical level index.
+    ctrl_name : str
+        Name of CTRL experiment.
+    exp_name : str
+        Name of EXP experiment.
+    outname : str
+        Output PNG filename.
+
+    Notes
+    -----
+    - CTRL and EXP panels share the same colorbar limits.
+    - DIFF uses a narrower range to highlight small differences.
+    - All panels use PlateCarree projection with coastlines.
+    """
     diff = exp - ctrl
     pressure = load_pressure(lev)
     title = f"{var} – Level {lev} ({pressure:.1f} mbar)"
@@ -238,6 +450,30 @@ def plot_three(Lon, Lat, ctrl, exp, var, lev, ctrl_name, exp_name, outname):
 # Zonal‑mean (single experiment)
 # ---------------------------------------------------------
 def plot_zonal_mean_colormap(lat, pressure, zm, var, exp_name, outname):
+    """Plot a zonal‑mean (latitude × pressure) cross‑section for one experiment.
+
+    Parameters
+    ----------
+    lat : np.ndarray
+        1D latitude array (degrees north), typically length 181.
+    pressure : np.ndarray
+        1D pressure array (mbar) for all FV3 vertical levels.
+    zm : np.ndarray
+        2D zonal‑mean field of shape (levels × latitudes).
+    var : str
+        Variable name (e.g., ``T_inc``, ``u_inc``).
+    exp_name : str
+        Name of the experiment.
+    outname : str
+        Output PNG filename.
+
+    Notes
+    -----
+    - Pressure axis is plotted on a log scale and inverted (top = low pressure).
+    - A dashed line marks the ~200 mbar jet‑level region.
+    - Contours are overlaid on the filled contour plot for structure clarity.
+    - Colorbar is tapered using ``tapered_colorbar`` for compact layout.
+    """
     fig, ax = plt.subplots(figsize=(8, 6))
 
     # Prevent colorbar overlap
@@ -274,7 +510,34 @@ def plot_zonal_mean_colormap(lat, pressure, zm, var, exp_name, outname):
 # ---------------------------------------------------------
 def plot_zonal_mean_colormap_three(lat, pressure, zm_ctrl, zm_exp,
                                    var, ctrl_name, exp_name, outname):
+    """Plot CTRL, EXP, and DIFF zonal‑mean cross‑sections.
 
+    Parameters
+    ----------
+    lat : np.ndarray
+        1D latitude array (degrees north).
+    pressure : np.ndarray
+        1D pressure array (mbar).
+    zm_ctrl : np.ndarray
+        CTRL zonal‑mean field (levels × latitudes).
+    zm_exp : np.ndarray
+        EXP zonal‑mean field (levels × latitudes).
+    var : str
+        Variable name.
+    ctrl_name : str
+        Name of the CTRL experiment.
+    exp_name : str
+        Name of the EXP experiment.
+    outname : str
+        Output PNG filename.
+
+    Notes
+    -----
+    - DIFF = EXP − CTRL is computed internally.
+    - All three panels share consistent contour levels.
+    - Pressure axis uses log scaling and is inverted.
+    - Jet‑level annotation (~200 mbar) is included for context.
+    """
     zm_diff = zm_exp - zm_ctrl
 
     fig, axes = plt.subplots(1, 3, figsize=(18, 6), constrained_layout=True)
@@ -311,10 +574,62 @@ def plot_zonal_mean_colormap_three(lat, pressure, zm_ctrl, zm_exp,
 
     fig.savefig(outname, dpi=150)
     plt.close()
+
 # ---------------------------------------------------------
 # MAIN
 # ---------------------------------------------------------
 def main():
+    """Main entry point for the increment‑maps diagnostic.
+
+    This function reads a YAML configuration file, loads increment fields
+    from one or two FV3‑JEDI experiments, and generates:
+
+    - Horizontal increment maps (single or CTRL–EXP–DIFF)
+    - Optional zonal‑mean cross‑sections (full 127‑level vertical)
+
+    The function supports two modes:
+
+    **Single‑experiment mode**
+        - One experiment listed in ``experiments``.
+        - Produces one map per variable × level.
+        - Optional zonal‑mean plots.
+
+    **Two‑experiment mode**
+        - Two experiments listed in ``experiments``.
+        - Produces CTRL, EXP, and DIFF (EXP − CTRL) maps.
+        - Optional zonal‑mean CTRL | EXP | DIFF cross‑sections.
+
+    YAML Structure
+    --------------
+    The YAML file must contain:
+
+    .. code-block:: yaml
+
+        vars: [T_inc, u_inc, v_inc, sphum_inc]
+        levels: [126, 75]
+        experiments:
+          - name: ctrl
+            prefix: "/path/to/ctrl/atminc.tile"
+          - name: exp
+            prefix: "/path/to/exp/atminc.tile"
+        grid:
+          prefix: "/path/to/C96_grid.tile"
+        output_dir: "./plots"
+        zonal_mean:
+          enabled: true
+
+    Command‑Line Usage
+    ------------------
+    .. code-block:: bash
+
+        ufsda-inc-maps --yaml diag.yaml
+
+    Notes
+    -----
+    - Only 1 or 2 experiments are supported.
+    - Output directory is created if it does not exist.
+    - All PNG files are written to ``output_dir``.
+    """
     if "--yaml" in sys.argv:
         idx = sys.argv.index("--yaml")
         yaml_file = sys.argv[idx + 1]
@@ -352,6 +667,7 @@ def main():
                 outname = f"{outdir}/{var}_L{lev}_{exp['name']}.png"
                 plot_single(Lon, Lat, field, var, lev, exp["name"], exp["prefix"], outname)
 
+        # Optional zonal‑mean diagnostics
         if zm_cfg.get("enabled", False):
             for var in vars_:
                 print(f"[1‑exp] Zonal mean full vertical: {var}")
@@ -379,6 +695,7 @@ def main():
                 plot_three(Lon, Lat, ctrl_field, exp_field,
                            var, lev, ctrl["name"], exp["name"], outname)
 
+        # Optional zonal‑mean diagnostics
         if zm_cfg.get("enabled", False):
             for var in vars_:
                 print(f"[2‑exp] Zonal mean full vertical: {var}")
@@ -398,6 +715,16 @@ def main():
     print("ERROR: Only 1 or 2 experiments supported.")
     return
 
-
 if __name__ == "__main__":
+    """Execute the increment‑maps diagnostic when run as a script.
+
+    Notes
+    -----
+    This simply forwards execution to ``main()``. The recommended usage is:
+
+        ufsda-inc-maps --yaml diag.yaml
+
+    which invokes this module via the console‑script entry point defined
+    in ``pyproject.toml``.
+    """
     main()
