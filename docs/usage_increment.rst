@@ -213,3 +213,21 @@ analysis increments from FV3-JEDI. With YAML-driven configuration and a
 simple CLI interface, it integrates cleanly into UFS-DA workflows and HPC
 batch pipelines.
 
+
+Example YAML
+------------
+
+A complete example YAML for increment diagnostics is included in:
+
+``ufs_da_diagnostics/examples/diag_fv3-jedi-tiles.yaml``
+
+This file demonstrates:
+
+- Tile-based increment maps
+- Dual-experiment comparisons
+- Zonal-mean diagnostics
+- Output directory structure
+
+Use it as a template for your own increment workflows.
+
+
