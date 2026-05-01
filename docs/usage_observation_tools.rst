@@ -132,3 +132,21 @@ Notes
 - Vector diagnostics require 2‑component variables.
 
 This completes the unified workflow for observation‑space tools.
+
+Example YAML
+------------
+
+An example observation diagnostics configuration is available in:
+
+``ufs_da_diagnostics/examples/diag_fv3-jedi_obs.yaml``
+
+It demonstrates:
+
+- ATMS, scalar, and vector diagnostics
+- Histogram and statistics settings
+- Scan-position and latitude-binned plots
+- Output directory configuration
+
+Use this file as a starting point for your observation workflows.
+
+
