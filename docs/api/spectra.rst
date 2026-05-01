@@ -43,12 +43,3 @@ Function Summary
 
     ufs_da_diagnostics.spectra.spectra_analysis_tiles.main
     ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main
-
-
-Full Source: spectra_analysis_bkg_inc.py
-----------------------------------------
-
-.. literalinclude:: ../../ufs_da_diagnostics/spectra/spectra_analysis_bkg_inc.py
-   :language: python
-   :linenos:
-
