@@ -16,19 +16,17 @@ Modules
 -------
 
 .. automodule:: ufs_da_diagnostics.spectra.spectra_core
-    :no-undoc-members:
-    :no-private-members:
-    :no-special-members:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 .. automodule:: ufs_da_diagnostics.spectra.spectra_analysis_tiles
-    :no-undoc-members:
-    :no-private-members:
-    :no-special-members:
+    :members:
+    :undoc-members:
 
 .. automodule:: ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc
-    :no-undoc-members:
-    :no-private-members:
-    :no-special-members:
+    :members:
+    :undoc-members:
 
 
 Function Summary
@@ -47,30 +45,10 @@ Function Summary
     ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main
 
 
-Detailed API
-------------
-
-SpectraCore
-~~~~~~~~~~~
-.. autoclass:: ufs_da_diagnostics.spectra.spectra_core.SpectraCore
-    :members:
-    :undoc-members:
-    :show-inheritance:
-
-spectra_analysis_tiles
-~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: ufs_da_diagnostics.spectra.spectra_analysis_tiles.main
-    :no-index:
-
-spectra_analysis_bkg_inc
-~~~~~~~~~~~~~~~~~~~~~~~~
-.. autofunction:: ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main
-    :no-index:
-
-
 Full Source: spectra_analysis_bkg_inc.py
 ----------------------------------------
 
 .. literalinclude:: ../../ufs_da_diagnostics/spectra/spectra_analysis_bkg_inc.py
    :language: python
    :linenos:
+
