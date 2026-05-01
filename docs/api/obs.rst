@@ -1,17 +1,17 @@
-Observation Diagnostics API
-===========================
+Observation Diagnostics Driver API
+==================================
 
-The observation diagnostics subsystem provides tools for generating
-statistics, histograms, scan‑position plots, and latitudinal bin
-summaries from IODA observation files. These diagnostics are used
-by the CLI driver ``ufsda-obs-diagnostic`` and by the plotting
-subsystem under ``ufs_da_diagnostics.plots``.
+The ``obs_diagnostic`` module provides the command-line interface for
+running observation diagnostics. It loads a YAML configuration file and
+dispatches all requested diagnostics through the
+``ObsDiagPlotter`` orchestrator in ``ufs_da_diagnostics.plots``.
 
-This page documents the core observation diagnostics engine.
+This module does not implement diagnostics directly; it only provides
+the CLI wrapper.
 
 
-Modules
--------
+Module
+------
 
 .. automodule:: ufs_da_diagnostics.obs.obs_diagnostic
     :members:
@@ -26,30 +26,20 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    ufs_da_diagnostics.obs.obs_diagnostic.ObsDiagnostic
-    ufs_da_diagnostics.obs.obs_diagnostic.load_ioda
-    ufs_da_diagnostics.obs.obs_diagnostic.compute_statistics
-    ufs_da_diagnostics.obs.obs_diagnostic.run_diagnostics
+    ufs_da_diagnostics.obs.obs_diagnostic.parse_args
+    ufs_da_diagnostics.obs.obs_diagnostic.main
 
 
 Detailed API
 ------------
 
-ObsDiagnostic
-~~~~~~~~~~~~~
+Argument Parsing
+~~~~~~~~~~~~~~~~
 
-.. autoclass:: ufs_da_diagnostics.obs.obs_diagnostic.ObsDiagnostic
-    :members:
-    :undoc-members:
-    :show-inheritance:
+.. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.parse_args
 
 
-Module‑Level Functions
-~~~~~~~~~~~~~~~~~~~~~~
+CLI Entry Point
+~~~~~~~~~~~~~~~
 
-.. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.load_ioda
-
-.. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.compute_statistics
-
-.. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.run_diagnostics
-
+.. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.main
