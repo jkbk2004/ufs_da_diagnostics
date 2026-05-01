@@ -1,46 +1,58 @@
 Increment Diagnostics API
 =========================
 
-This module provides tools for generating tile‑based increment maps and
-zonal‑mean diagnostics from FV3‑JEDI increment files. These diagnostics
-are used to visualize spatial increment structure and compare
-experiment‑to‑experiment differences.
+The increment diagnostics subsystem provides tools for generating
+FV3-JEDI increment maps (per tile), global stitched maps, and zonal
+mean summaries. These diagnostics are used by the CLI driver
+``ufsda-increment-maps`` and form the core of the increment analysis
+workflow.
 
-The increment plotting routines are used internally by the increment
-driver and can also be imported directly for custom workflows.
+This page documents the full increment‑mapping engine under
+``ufs_da_diagnostics.increment``.
 
 
-Tile‑Based Increment Maps
--------------------------
-
-The ``increment_maps_tiles`` module generates:
-
-- Tile‑based increment maps for ``u``, ``v``, ``t``, ``ps`` and other variables
-- Multi‑panel figures for single or dual‑experiment comparisons
-- Optional zonal‑mean diagnostics
-- Automatic handling of FV3 cubed‑sphere tile geometry
+Modules
+-------
 
 .. automodule:: ufs_da_diagnostics.increment.increment_maps_tiles
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
 
-Increment Core Utilities
-------------------------
+Function Summary
+----------------
 
-Core helper functions used for reading increment files, extracting
-variables, and preparing fields for plotting.
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
 
-.. automodule:: ufs_da_diagnostics.increment.increment_core
-   :members:
-   :undoc-members:
-   :show-inheritance:
+    ufs_da_diagnostics.increment.increment_maps_tiles.IncrementMaps
+    ufs_da_diagnostics.increment.increment_maps_tiles.load_increment
+    ufs_da_diagnostics.increment.increment_maps_tiles.compute_zonal_mean
+    ufs_da_diagnostics.increment.increment_maps_tiles.plot_tile_map
+    ufs_da_diagnostics.increment.increment_maps_tiles.plot_global_map
 
 
-Related Usage Pages
--------------------
+Detailed API
+------------
 
-- :doc:`../usage_increment` — Increment maps and zonal‑mean workflow  
-- :doc:`../usage_spectra` — Spectral diagnostics  
-- :doc:`../usage_observation_tools` — Observation diagnostics  
+IncrementMaps
+~~~~~~~~~~~~~
+
+.. autoclass:: ufs_da_diagnostics.increment.increment_maps_tiles.IncrementMaps
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module‑Level Functions
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: ufs_da_diagnostics.increment.increment_maps_tiles.load_increment
+
+.. autofunction:: ufs_da_diagnostics.increment.increment_maps_tiles.compute_zonal_mean
+
+.. autofunction:: ufs_da_diagnostics.increment.increment_maps_tiles.plot_tile_map
+
+.. autofunction:: ufs_da_diagnostics.increment.increment_maps_tiles.plot_global_map
