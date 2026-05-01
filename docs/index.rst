@@ -13,7 +13,6 @@ visualizing and analyzing FV3-JEDI data assimilation diagnostics. It includes:
 
 Use the navigation on the left to explore the User Guide and API Reference.
 
-
 .. toctree::
    :maxdepth: 2
    :caption: User Guide
@@ -27,6 +26,7 @@ Use the navigation on the left to explore the User Guide and API Reference.
    usage_observation_overview
    usage_observation_tools
    usage_logs
+   usage_plots
 
 
 .. toctree::
