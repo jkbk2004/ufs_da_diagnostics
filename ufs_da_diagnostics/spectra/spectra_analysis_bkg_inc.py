@@ -1,4 +1,30 @@
 #!/usr/bin/env python3
+"""
+BKG–INC Spectral Diagnostics Driver
+===================================
+
+This script performs spectral diagnostics comparing **background fields**
+against **analysis increments** for a single experiment. It is the backend
+for the CLI entry point:
+
+    ufsda-spectra-bkg-inc --yaml spectra_bkg_inc.yaml
+
+The workflow:
+
+1. Read YAML configuration
+2. Load background fields from a single ATM file (all 6 tiles)
+3. Load increment fields using ``SpectraCore`` (tile → global lat/lon)
+4. Compute isotropic spectra for selected variables and levels
+5. Generate comparison plots:
+   - Background spectrum
+   - Increment spectrum
+   - Overlay plot (BKG + INC)
+   - Annotated percentage contribution of increments
+
+This driver uses:
+- ``SpectraCore`` for increment processing
+- Local helper functions for background loading and plotting
+"""
 
 import os
 import sys
@@ -15,6 +41,29 @@ from .spectra_core import SpectraCore
 # Load background field (single ATM file, 6 tiles → global lat/lon)
 # ---------------------------------------------------------
 def load_bkg_field_global(atm_file, varname, level):
+    """Load a background field from a single ATM file and regrid to lat/lon.
+
+    Parameters
+    ----------
+    atm_file : str
+        Path to the ATM background file containing all 6 tiles.
+    varname : str
+        Variable name inside the ATM file (e.g., ``"T"`` or ``"u"``).
+    level : int
+        Vertical level index.
+
+    Returns
+    -------
+    numpy.ndarray
+        2D field interpolated onto a regular global lat/lon grid.
+
+    Notes
+    -----
+    - Background fields are stored as ``(tile, y, x)``.
+    - All tiles are flattened and concatenated.
+    - Regridding uses nearest-neighbor interpolation, matching
+      ``SpectraCore.build_global``.
+    """
     with Dataset(atm_file) as nc:
         lon = nc["lon"][:]   # (tile, grid_yt, grid_xt)
         lat = nc["lat"][:]   # (tile, grid_yt, grid_xt)
@@ -33,7 +82,6 @@ def load_bkg_field_global(atm_file, varname, level):
         lon_global   = np.concatenate(lons)
         lat_global   = np.concatenate(lats)
 
-    # Regrid to regular lat-lon like SpectraCore.build_global
     lon_new = np.linspace(-180, 180, 360)
     lat_new = np.linspace(-90, 90, 181)
     Lon, Lat = np.meshgrid(lon_new, lat_new)
@@ -52,15 +100,37 @@ def load_bkg_field_global(atm_file, varname, level):
 # Background: overlay bkg + inc + percentage text (boxed)
 # ---------------------------------------------------------
 def plot_bkg_overlay(k, Ek_bkg, Ek_inc, long_name, level, outname, pct_text):
+    """Plot background and increment spectra with annotation.
+
+    Parameters
+    ----------
+    k : numpy.ndarray
+        Wavenumber array.
+    Ek_bkg : numpy.ndarray
+        Background isotropic spectrum.
+    Ek_inc : numpy.ndarray
+        Increment isotropic spectrum.
+    long_name : str
+        Human-readable variable name for plot title.
+    level : int
+        Vertical level index.
+    outname : str
+        Output PNG filename.
+    pct_text : str
+        Text describing increment percentage contribution.
+
+    Notes
+    -----
+    The plot includes:
+    - Background spectrum (black)
+    - Increment spectrum (red)
+    - Annotated DA contribution ranges
+    """
     fig, ax = plt.subplots(figsize=(7, 5))
 
-    # Background
     ax.loglog(k, Ek_bkg, color="k", linewidth=1.5, label="Background")
-
-    # Increment overlay
     ax.loglog(k, Ek_inc, color="tab:red", linewidth=1.5, label="Increment")
 
-    # More specific title
     ax.set_title(
         f"{long_name} Isotropic Spectra — Background vs Increment (Level {level})"
     )
@@ -70,7 +140,6 @@ def plot_bkg_overlay(k, Ek_bkg, Ek_inc, long_name, level, outname, pct_text):
     ax.grid(True, which="both", alpha=0.3)
     ax.legend()
 
-    # Annotation block (black text, smaller font, boxed)
     ax.text(
         0.02, 0.02,
         pct_text + "\n"
@@ -99,6 +168,47 @@ def plot_bkg_overlay(k, Ek_bkg, Ek_inc, long_name, level, outname, pct_text):
 # MAIN
 # ---------------------------------------------------------
 def main():
+    """Run BKG–INC spectral diagnostics from a YAML configuration file.
+
+    This function implements the workflow for comparing background fields
+    against analysis increments for a single experiment. It is invoked by
+    the CLI entry point ``ufsda-spectra-bkg-inc``.
+
+    YAML Configuration
+    ------------------
+    Expected structure:
+
+    .. code-block:: yaml
+
+        background:
+          atm_file: "/path/to/atm_background.nc"
+
+        increments:
+          prefix: "/path/to/atminc.tile"
+          grid_prefix: "/path/to/C96_grid.tile"
+
+        mapping:
+          - bkg: T
+            inc: T_inc
+            long_name: Temperature increment
+
+        spectra:
+          levels: [126, 75]
+          output_dir: "./spectra_bkg_inc"
+
+    Workflow
+    --------
+    1. Load background fields from a single ATM file
+    2. Load increment fields using ``SpectraCore.build_global``
+    3. Compute isotropic spectra for both fields
+    4. Compute increment percentage contribution
+    5. Generate overlay plots
+
+    Returns
+    -------
+    None
+        All output is written to PNG files in the configured output directory.
+    """
     # --- YAML handling (supports --yaml or positional) ---
     if "--yaml" in sys.argv:
         idx = sys.argv.index("--yaml")
@@ -159,3 +269,4 @@ def main():
 
 if __name__ == "__main__":
     main()
+
