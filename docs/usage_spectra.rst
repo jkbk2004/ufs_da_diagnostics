@@ -185,8 +185,8 @@ See Also
 
 - :doc:`../api/spectra`
 - :doc:`../usage_increment`
-- :doc:`../usage_log`
-- :doc:`../usage_obs`
+- :doc:`usage_log`
+- :doc:`usage_observation_tools`
 
 
 Example YAML
