@@ -1,4 +1,3 @@
-
 UFS-DA Diagnostics
 ==================
 
@@ -8,6 +7,7 @@ visualizing and analyzing FV3-JEDI data assimilation diagnostics. It includes:
 - Spectral diagnostics (tile-based and background/increment)
 - Increment maps and zonal-mean diagnostics
 - Observation-space diagnostics (ATMS, scalar, vector)
+- Observation inspection utilities
 - JEDI log parsing
 - Command-line tools for batch workflows
 
@@ -20,11 +20,12 @@ Use the navigation on the left to explore the User Guide and API Reference.
 
    installation
    quickstart
+
    usage_spectra
    usage_increment
-   usage_plots
-   usage_obs_diagnostic
-   usage_obs
+
+   usage_observation_overview
+   usage_observation_tools
    usage_logs
 
 
