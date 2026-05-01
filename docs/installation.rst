@@ -2,8 +2,9 @@ Installation
 ============
 
 This page describes how to install the ``ufs-da-diagnostics`` package
-from source. The package is designed to be lightweight and easy to
-integrate into existing UFS-DA or FV3-JEDI workflows.
+from source. The package is lightweight and designed to integrate easily
+into existing UFS-DA or FV3-JEDI workflows.
+
 
 Install from Source
 -------------------
@@ -23,6 +24,7 @@ Install using ``pip``:
 
 This installs the package along with all required dependencies.
 
+
 Editable Install (for development)
 ----------------------------------
 
@@ -34,6 +36,7 @@ If you plan to modify the diagnostics or contribute improvements, use:
 
 This allows changes in the source tree to be reflected immediately
 without reinstalling.
+
 
 Dependencies
 ------------
@@ -47,7 +50,8 @@ The package requires:
 - cartopy
 - pyyaml
 
-These are automatically installed when using ``pip install .``.
+These are installed automatically when using ``pip install .``.
+
 
 Testing the Installation
 ------------------------
@@ -61,6 +65,7 @@ To verify that the package is installed correctly:
 
 If no errors appear, the installation is successful.
 
+
 Building Documentation
 ----------------------
 
@@ -70,8 +75,12 @@ To build the documentation locally:
 
     python -m sphinx -b html docs docs/_build/html
 
-Open the generated HTML:
+Open the generated HTML in a browser:
 
 .. code-block:: bash
 
-    docs/_build/html/index.html
+    open docs/_build/html/index.html   # macOS
+    xdg-open docs/_build/html/index.html   # Linux
+    start docs/_build/html/index.html      # Windows
+
+
