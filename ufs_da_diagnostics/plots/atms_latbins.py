@@ -2,6 +2,38 @@
 # ATMS Latitude-Binned Diagnostics (QC2-filtered)
 # ============================================================
 
+"""
+ATMS Latitude‑Binned Diagnostics
+================================
+
+This module computes latitude‑binned OMB/OMA statistics for ATMS
+radiance observations using QC2 filtering. It reproduces the behavior
+of the original latitude‑binned diagnostics from ``obs_diag_plots.py``,
+but in a cleaner, modular form.
+
+Workflow
+--------
+1. Load OMB and OMA using loader utilities (supports ombg/oman groups)
+2. Load QC flags using ``load_qc_universal`` (Location × Channel)
+3. Broadcast latitude to match QC shape
+4. Apply QC2==0 mask and flatten arrays
+5. Compute:
+   - Mean OMB / OMA per latitude bin
+   - Std OMB / OMA per latitude bin
+   - RMS OMB / OMA per latitude bin
+6. Produce a two‑panel figure:
+   - Panel 1: Mean + Std (dual axis)
+   - Panel 2: RMS
+
+Output
+------
+A single PNG file:
+
+    atms_latbins_qc2.png
+
+saved in the specified output directory.
+"""
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -21,7 +53,26 @@ LAT_BINS = np.array([
 
 def _bin_mean(lat, values):
     """
-    Bin values by latitude and compute mean in each bin.
+    Compute mean values in predefined latitude bins.
+
+    Parameters
+    ----------
+    lat : numpy.ndarray
+        1D array of latitudes corresponding to flattened observations.
+    values : numpy.ndarray
+        1D array of OMB/OMA values aligned with ``lat``.
+
+    Returns
+    -------
+    centers : numpy.ndarray
+        Latitude bin centers.
+    out : numpy.ndarray
+        Mean value in each latitude bin (NaN if no data in bin).
+
+    Notes
+    -----
+    - Uses ``LAT_BINS`` as bin edges.
+    - ``np.nanmean`` ensures missing values do not contaminate bins.
     """
     nbins = len(LAT_BINS) - 1
     out = np.zeros(nbins)
@@ -39,8 +90,39 @@ def _bin_mean(lat, values):
 
 def plot_latbins_atms(f, var, label, outdir):
     """
-    ATMS latitude-binned diagnostics (QC2-filtered).
-    Uses ombg/oman via loader functions.
+    Plot ATMS latitude‑binned OMB/OMA diagnostics (QC2‑filtered).
+
+    This function computes and plots:
+    - Mean OMB / OMA vs latitude
+    - Std  OMB / OMA vs latitude
+    - RMS  OMB / OMA vs latitude
+
+    using QC2==0 observations only.
+
+    Parameters
+    ----------
+    f : xarray.Dataset or dict-like
+        Observation diagnostics file containing OMB, OMA, QC, and
+        ``MetaData/latitude``.
+    var : str
+        Variable name for ATMS radiances (e.g., ``"brightness_temperature"``).
+    label : str
+        Short label used in plot titles and output filenames.
+    outdir : str
+        Directory where the output PNG file will be saved.
+
+    Notes
+    -----
+    - QC mask is applied per (Location, Channel).
+    - Latitude is broadcast to match QC shape before masking.
+    - All arrays are flattened after masking.
+    - RMS is computed explicitly even though it equals std for zero‑mean
+      distributions; kept for clarity and compatibility with legacy plots.
+
+    Returns
+    -------
+    None
+        A single PNG file is written to ``outdir``.
     """
     print("[ATMS] Latitude-binned diagnostics (QC2-filtered)...")
 
@@ -81,7 +163,7 @@ def plot_latbins_atms(f, var, label, outdir):
     std_omb = np.sqrt(mean_omb2)
     std_oma = np.sqrt(mean_oma2)
 
-    # RMS (same as std here, but kept explicit)
+    # RMS (explicit)
     _, rms_omb = _bin_mean(lat, np.sqrt(omb**2))
     _, rms_oma = _bin_mean(lat, np.sqrt(oma**2))
 
