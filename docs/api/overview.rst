@@ -13,125 +13,9 @@ specific class of analysis:
 - Log parsing tools (FV3‑JEDI logs)
 - Observation inspection utilities (IODA structure exploration)
 
-This page provides a high‑level overview of each subsystem and links to
-their detailed API documentation.
+This page provides a high‑level overview of each subsystem, diagrams
+showing how they relate, and links to the detailed API documentation.
 
-
-Observation Diagnostics
------------------------
-
-Observation‑space diagnostics are driven by a YAML configuration file
-and executed through the ``obs_diagnostic`` driver. These diagnostics
-produce histograms, statistics, scan‑position plots, and latitude‑binned
-diagnostics for ATMS, scalar, and vector observations.
-
-API Reference:
-
-- :doc:`obs_diagnostic`
-- :doc:`obs` (observation utilities)
-- :doc:`plots` (observation plotting classes)
-
-Related Usage:
-
-- :doc:`../usage_observation_tools`
-
-
-Increment Diagnostics
----------------------
-
-Increment diagnostics generate tile‑based increment maps and zonal‑mean
-plots from FV3‑JEDI increment files. These tools support single‑ and
-dual‑experiment comparisons.
-
-API Reference:
-
-- :doc:`increment`
-- :doc:`plots` (increment plotting utilities)
-
-Related Usage:
-
-- :doc:`../usage_increment`
-
-
-Spectral Diagnostics
---------------------
-
-Spectral diagnostics compute and visualize 1D and 2D spectra from
-increment and background fields. These tools are used to analyze
-scale‑dependent behavior and compare spectral characteristics between
-experiments.
-
-API Reference:
-
-- :doc:`spectra`
-- :doc:`plots` (spectral plotting utilities)
-
-Related Usage:
-
-- :doc:`../usage_spectra`
-
-
-Plotting Subsystem
-------------------
-
-The plotting subsystem provides shared utilities used across all
-diagnostics:
-
-- Observation diagnostics plotting
-- Spectral plotting
-- Increment plotting
-- Shared color maps, figure helpers, and layout utilities
-
-API Reference:
-
-- :doc:`plots`
-
-
-Log Parsing Tools
------------------
-
-The log parsing subsystem extracts iteration summaries, QC statistics,
-and timing information from FV3‑JEDI logs.
-
-API Reference:
-
-- :doc:`log`
-
-Related Usage:
-
-- :doc:`../usage_logs`
-
-
-Observation Inspection Utilities
---------------------------------
-
-Lightweight helpers for exploring IODA files:
-
-- List variables
-- List groups
-- Inspect metadata
-
-API Reference:
-
-- :doc:`obs`
-
-Related Usage:
-
-- :doc:`../usage_observation_tools`
-
-
-Summary
--------
-
-The diagnostics framework is modular and extensible, allowing users to:
-
-- Run diagnostics via YAML‑driven drivers
-- Import plotting classes directly for custom workflows
-- Inspect observation files
-- Parse JEDI logs
-- Combine diagnostics across subsystems
-
-Use the links above to explore each subsystem in detail.
 
 Subsystem Relationships
 -----------------------
@@ -176,3 +60,152 @@ other within ``ufs-da-diagnostics``:
         style L fill:#e8f5e9,stroke:#2e7d32
         style J fill:#fff3cd,stroke:#b8860b
 
+
+Data Flow Overview
+------------------
+
+The following diagram shows how data moves through the diagnostics
+framework:
+
+.. mermaid::
+
+    flowchart LR
+
+        A[IODA Diagnostics Files] --> B[ObsDiagPlotter]
+        B --> C[Plots (ATMS, Scalar, Vector)]
+
+        D[FV3 Increment Files] --> E[Increment Maps Tiles]
+        E --> F[Tile Maps & Zonal Means]
+
+        D --> G[Spectra Core]
+        G --> H[SpectraPlotter]
+        H --> I[1D/2D Spectra]
+
+        J[JEDI Log File] --> K[LogParser]
+        K --> L[QC Summary, Iteration Summary, Timing]
+
+        style B fill:#e8f5e9,stroke:#2e7d32
+        style E fill:#e8f5e9,stroke:#2e7d32
+        style H fill:#e8f5e9,stroke:#2e7d32
+        style K fill:#e8f5e9,stroke:#2e7d32
+
+
+Observation Diagnostics Driver Sequence
+---------------------------------------
+
+This sequence diagram shows how the YAML‑driven observation diagnostics
+driver orchestrates the workflow:
+
+.. mermaid::
+
+    sequenceDiagram
+        participant U as User
+        participant D as obs_diagnostic
+        participant P as ObsDiagPlotter
+        participant F as File Loader
+        participant G as Plotting Utils
+
+        U->>D: python -m obs_diagnostic --yaml config.yaml
+        D->>D: Parse YAML
+        D->>P: Initialize plotter
+        P->>F: Load IODA file
+        F-->>P: Return variables, metadata
+        P->>G: Generate plots (hist, stats, scanpos, latbins)
+        G-->>P: Save figures
+        P-->>D: Diagnostics complete
+        D-->>U: Output written to <outdir>
+
+
+Subsystem Summaries
+-------------------
+
+Observation Diagnostics
+^^^^^^^^^^^^^^^^^^^^^^^
+
+YAML‑driven diagnostics for:
+
+- ATMS
+- Scalar observations
+- Vector observations
+
+API Reference:
+
+- :doc:`obs_diagnostic`
+- :doc:`obs`
+- :doc:`plots`
+
+Usage:
+
+- :doc:`../usage_observation_tools`
+
+
+Increment Diagnostics
+^^^^^^^^^^^^^^^^^^^^^
+
+Tile‑based increment maps and zonal‑mean diagnostics.
+
+API Reference:
+
+- :doc:`increment`
+- :doc:`plots`
+
+Usage:
+
+- :doc:`../usage_increment`
+
+
+Spectral Diagnostics
+^^^^^^^^^^^^^^^^^^^^
+
+1D and 2D spectra for increment and background fields.
+
+API Reference:
+
+- :doc:`spectra`
+- :doc:`plots`
+
+Usage:
+
+- :doc:`../usage_spectra`
+
+
+Log Parsing Tools
+^^^^^^^^^^^^^^^^^^
+
+Extract iteration summaries, QC statistics, and timing from JEDI logs.
+
+API Reference:
+
+- :doc:`log`
+
+Usage:
+
+- :doc:`../usage_logs`
+
+
+Observation Inspection Utilities
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+List variables, groups, and metadata in IODA files.
+
+API Reference:
+
+- :doc:`obs`
+
+Usage:
+
+- :doc:`../usage_observation_tools`
+
+
+Summary
+-------
+
+The diagnostics framework is modular and extensible, allowing users to:
+
+- Run diagnostics via YAML‑driven drivers
+- Import plotting classes directly for custom workflows
+- Inspect observation files
+- Parse JEDI logs
+- Combine diagnostics across subsystems
+
+Use the links above to explore each subsystem in detail.
