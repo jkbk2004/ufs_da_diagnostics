@@ -1,31 +1,55 @@
-Observation Utilities API
-=========================
+Observation Diagnostics API
+===========================
 
-This module provides lightweight helpers for inspecting IODA observation
-files. These utilities are useful when preparing YAML configurations for
-observation diagnostics or when exploring file structure.
+The observation diagnostics subsystem provides tools for generating
+statistics, histograms, scan‑position plots, and latitudinal bin
+summaries from IODA observation files. These diagnostics are used
+by the CLI driver ``ufsda-obs-diagnostic`` and by the plotting
+subsystem under ``ufs_da_diagnostics.plots``.
 
-.. automodule:: ufs_da_diagnostics.obs.utils
-   :members:
-   :undoc-members:
-   :show-inheritance:
+This page documents the core observation diagnostics engine.
 
-Examples
---------
 
-List variables in an IODA file:
+Modules
+-------
 
-.. code-block:: python
+.. automodule:: ufs_da_diagnostics.obs.obs_diagnostic
+    :members:
+    :undoc-members:
+    :show-inheritance:
 
-    from ufs_da_diagnostics.obs.utils import list_variables
-    print(list_variables("diag_t.nc"))
 
-List groups:
+Function Summary
+----------------
 
-.. code-block:: python
+.. autosummary::
+    :toctree: generated/
+    :nosignatures:
 
-    from ufs_da_diagnostics.obs.utils import list_groups
-    print(list_groups("diag_t.nc"))
+    ufs_da_diagnostics.obs.obs_diagnostic.ObsDiagnostic
+    ufs_da_diagnostics.obs.obs_diagnostic.load_ioda
+    ufs_da_diagnostics.obs.obs_diagnostic.compute_statistics
+    ufs_da_diagnostics.obs.obs_diagnostic.run_diagnostics
 
-See :doc:`../usage_observation_tools` for the full workflow.
+
+Detailed API
+------------
+
+ObsDiagnostic
+~~~~~~~~~~~~~
+
+.. autoclass:: ufs_da_diagnostics.obs.obs_diagnostic.ObsDiagnostic
+    :members:
+    :undoc-members:
+    :show-inheritance:
+
+
+Module‑Level Functions
+~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.load_ioda
+
+.. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.compute_statistics
+
+.. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.run_diagnostics
 
