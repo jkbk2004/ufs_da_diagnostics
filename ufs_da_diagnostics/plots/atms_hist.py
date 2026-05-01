@@ -1,7 +1,26 @@
 #!/usr/bin/env python3
 """
-ATMS per-channel histograms (QC2==0)
-Replicates the original behavior from obs_diag_plots.py
+ATMS Per‑Channel Histograms
+===========================
+
+This module generates per‑channel histograms for ATMS radiance
+observations using the same logic as the original
+``obs_diag_plots.py`` implementation.
+
+The workflow:
+
+1. Load QC2 flags, OMB, and OMA for an ATMS variable
+2. Apply QC2==0 mask (assimilated observations only)
+3. Compute adaptive histogram bins based on OMB standard deviation
+4. Plot:
+   - Grey histogram of OMB
+   - KDE of OMB (dimgray)
+   - KDE of OMA (red)
+5. Annotate assimilated count
+6. Save one PNG per channel
+
+This module is used by the observation diagnostics subsystem and is
+typically invoked indirectly through higher‑level plot orchestrators.
 """
 
 import os
@@ -15,8 +34,44 @@ from .utils_common import annotate_assimilated
 
 def plot_hist_atms(f, varname, label, outdir):
     """
-    ATMS histogram for each channel.
-    Fully equivalent to the original obs_diag_plots.py implementation.
+    Plot per‑channel ATMS histograms for a given variable.
+
+    This function reproduces the original ATMS histogram behavior from
+    ``obs_diag_plots.py``. For each channel, it plots:
+
+    - Grey histogram of OMB (QC2==0 only)
+    - KDE of OMB (dimgray)
+    - KDE of OMA (red)
+    - Assimilated count annotation
+
+    Adaptive bin counts are selected based on the standard deviation of
+    OMB for each channel.
+
+    Parameters
+    ----------
+    f : xarray.Dataset or dict-like
+        Observation diagnostics file handle or structure containing
+        OMB, OMA, and QC fields.
+    varname : str
+        Name of the ATMS variable (e.g., ``"brightness_temperature"``,
+        ``"atms_bt"``).
+    label : str
+        Short label used in plot titles and output filenames.
+    outdir : str
+        Directory where output PNG files will be written.
+
+    Notes
+    -----
+    - Only QC2==0 observations are included.
+    - If QC2 is missing or not 2‑D, the function prints a skip message.
+    - One PNG file is produced per channel.
+    - KDE plotting is wrapped in a try/except to avoid failures on
+      degenerate distributions.
+
+    Returns
+    -------
+    None
+        PNG files are written to ``outdir``.
     """
     os.makedirs(outdir, exist_ok=True)
 
