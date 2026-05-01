@@ -187,3 +187,21 @@ See Also
 - :doc:`../usage_increment`
 - :doc:`../usage_log`
 - :doc:`../usage_obs`
+
+
+Example YAML
+------------
+
+A ready-to-run background–increment spectra YAML is provided in:
+
+``ufs_da_diagnostics/examples/diag_fv3-jedi-bkg_inc.yaml``
+
+This example includes:
+
+- Background and increment file definitions
+- Variable selection
+- 1D and 2D spectra settings
+- Vertical variance diagnostics
+
+You can adapt this file for your own spectral analysis.
+
