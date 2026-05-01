@@ -2,6 +2,40 @@
 # ATMS Scan-Position Diagnostics (QC2-filtered)
 # ============================================================
 
+"""
+ATMS Scan‑Position Diagnostics
+==============================
+
+This module computes scan‑position‑dependent OMB/OMA statistics for
+ATMS radiance observations using QC2 filtering. It reproduces the
+behavior of the original scan‑position diagnostics from
+``obs_diag_plots.py`` but in a modular, maintainable form.
+
+Workflow
+--------
+1. Load OMB and OMA using loader utilities (supports ombg/oman groups)
+2. Load QC flags using ``load_qc_universal`` (Location × Channel)
+3. Load scan position and channel number from ``MetaData`` group
+4. Broadcast scan position to match QC shape
+5. Apply QC2==0 mask and flatten arrays
+6. Compute, for each scan position:
+   - Mean OMB / OMA
+   - Std  OMB / OMA
+   - RMS  OMB / OMA
+7. Produce a three‑panel figure:
+   - Window channels
+   - O₂ temperature channels
+   - H₂O channels
+
+Output
+------
+A single PNG file:
+
+    atms_scan_position_qc2.png
+
+saved in the specified output directory.
+"""
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -12,12 +46,51 @@ from .utils_loaders import (
     load_qc_universal,
 )
 
+# Channel groups for ATMS
 WINDOW_CH = [1, 2, 16, 17]
 O2_CH     = list(range(3, 16))
 H2O_CH    = list(range(18, 23))
 
 
 def _compute_stats_by_scan(omb, oma, scanpos, channels, ch_group):
+    """
+    Compute OMB/OMA statistics grouped by scan position.
+
+    Parameters
+    ----------
+    omb : numpy.ndarray
+        1D array of OMB values after QC filtering.
+    oma : numpy.ndarray
+        1D array of OMA values after QC filtering.
+    scanpos : numpy.ndarray
+        1D array of scan positions aligned with ``omb`` and ``oma``.
+    channels : numpy.ndarray
+        1D array of channel numbers aligned with ``omb`` and ``oma``.
+    ch_group : list[int]
+        List of channel numbers defining the group (e.g., window, O₂, H₂O).
+
+    Returns
+    -------
+    scan_positions : numpy.ndarray
+        Unique scan positions in ascending order.
+    mean_omb : numpy.ndarray
+        Mean OMB per scan position.
+    mean_oma : numpy.ndarray
+        Mean OMA per scan position.
+    std_omb : numpy.ndarray
+        Standard deviation of OMB per scan position.
+    std_oma : numpy.ndarray
+        Standard deviation of OMA per scan position.
+    rms_omb : numpy.ndarray
+        RMS of OMB per scan position.
+    rms_oma : numpy.ndarray
+        RMS of OMA per scan position.
+
+    Notes
+    -----
+    - Only observations whose channel is in ``ch_group`` are included.
+    - ``np.nanmean`` and ``np.nanstd`` ensure robustness to missing data.
+    """
     scan_positions = np.unique(scanpos)
     nscan = len(scan_positions)
 
@@ -45,6 +118,29 @@ def _compute_stats_by_scan(omb, oma, scanpos, channels, ch_group):
 
 
 def _plot_panel(ax, scanpos, mean_omb, mean_oma, std_omb, std_oma, rms_omb, rms_oma, title):
+    """
+    Plot a single scan‑position diagnostics panel.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axes object to draw on.
+    scanpos : numpy.ndarray
+        Scan positions.
+    mean_omb, mean_oma : numpy.ndarray
+        Mean OMB/OMA per scan position.
+    std_omb, std_oma : numpy.ndarray
+        Standard deviation per scan position.
+    rms_omb, rms_oma : numpy.ndarray
+        RMS per scan position.
+    title : str
+        Panel title.
+
+    Notes
+    -----
+    - Mean is plotted on the left y‑axis.
+    - Std and RMS are plotted on the right y‑axis.
+    """
     ax.plot(scanpos, mean_omb, "o-", color="blue", label="Mean OMB")
     ax.plot(scanpos, mean_oma, "o-", color="red", label="Mean OMA")
     ax.set_ylabel("Mean")
@@ -65,6 +161,40 @@ def _plot_panel(ax, scanpos, mean_omb, mean_oma, std_omb, std_oma, rms_omb, rms_
 
 
 def plot_scan_position_atms(f, var, label, outdir):
+    """
+    Plot ATMS scan‑position OMB/OMA diagnostics (QC2‑filtered).
+
+    This function generates a three‑panel figure showing scan‑position
+    statistics for:
+
+    1. Window channels (1, 2, 16, 17)
+    2. O₂ temperature channels (3–15)
+    3. H₂O channels (18–22)
+
+    Parameters
+    ----------
+    f : xarray.Dataset or dict-like
+        Observation diagnostics file containing OMB, OMA, QC, and
+        ``MetaData/sensorScanPosition`` and ``MetaData/sensorChannelNumber``.
+    var : str
+        Variable name for ATMS radiances.
+    label : str
+        Short label used in log messages and output filenames.
+    outdir : str
+        Directory where the output PNG file will be saved.
+
+    Notes
+    -----
+    - QC mask is applied per (Location, Channel).
+    - Scan position is broadcast to match QC shape before masking.
+    - All arrays are flattened after masking.
+    - One PNG file is produced containing all three channel groups.
+
+    Returns
+    -------
+    None
+        A single PNG file is written to ``outdir``.
+    """
     print("[ATMS] Scan-position diagnostics (QC2-filtered)...")
 
     os.makedirs(outdir, exist_ok=True)
