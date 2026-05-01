@@ -25,7 +25,11 @@ autodoc_typehints = "description"
 default_role = "code"
 
 templates_path = ["_templates"]
-exclude_patterns = []
+
+# ⭐ CRITICAL FIX: prevent autosummary from reading its own output
+exclude_patterns = [
+    "api/generated/*",
+]
 
 # -- Options for HTML output -------------------------------------------------
 
