@@ -38,13 +38,13 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    SpectraCore
-    SpectraCore.compute_spectrum
-    SpectraCore.compute_vertical_variance
-    SpectraCore.load_field
+    ufs_da_diagnostics.spectra.spectra_core.SpectraCore
+    ufs_da_diagnostics.spectra.spectra_core.SpectraCore.compute_spectrum
+    ufs_da_diagnostics.spectra.spectra_core.SpectraCore.compute_vertical_variance
+    ufs_da_diagnostics.spectra.spectra_core.SpectraCore.load_field
 
-    main  # from spectra_analysis_tiles
-    main  # from spectra_analysis_bkg_inc
+    ufs_da_diagnostics.spectra.spectra_analysis_tiles.main
+    ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main
 
 
 Detailed API
@@ -60,7 +60,17 @@ SpectraCore
 spectra_analysis_tiles
 ~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: ufs_da_diagnostics.spectra.spectra_analysis_tiles.main
+    :no-index:
 
 spectra_analysis_bkg_inc
 ~~~~~~~~~~~~~~~~~~~~~~~~
 .. autofunction:: ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main
+    :no-index:
+
+
+Full Source: spectra_analysis_bkg_inc.py
+----------------------------------------
+
+.. literalinclude:: ../../ufs_da_diagnostics/spectra/spectra_analysis_bkg_inc.py
+   :language: python
+   :linenos:
