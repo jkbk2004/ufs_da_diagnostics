@@ -132,3 +132,47 @@ The diagnostics framework is modular and extensible, allowing users to:
 - Combine diagnostics across subsystems
 
 Use the links above to explore each subsystem in detail.
+
+Subsystem Relationships
+-----------------------
+
+The diagram below shows how the diagnostics subsystems relate to each
+other within ``ufs-da-diagnostics``:
+
+.. mermaid::
+
+    graph TD
+
+        A[Observation Diagnostics<br/>(YAML-driven)] --> B[ObsDiagPlotter<br/>plots.obs_diag_plotter]
+        A --> C[Observation Utilities<br/>obs.utils]
+
+        D[Increment Diagnostics<br/>(tile maps, zonal means)] --> E[Increment Maps Tiles<br/>increment.increment_maps_tiles]
+        D --> F[Increment Core<br/>increment.increment_core]
+
+        G[Spectral Diagnostics] --> H[SpectraPlotter<br/>plots.spectra_plots]
+        G --> I[Spectral Core<br/>spectra.spectra_core]
+
+        B --> J[Plotting Subsystem<br/>plots.utils]
+        E --> J
+        H --> J
+
+        K[JEDI Log Tools] --> L[LogParser<br/>logs.log_parser]
+
+        C --> M[IODA Files]
+        E --> N[FV3 Increment Files]
+        H --> N
+
+        style A fill:#d9e8ff,stroke:#4a78c2,stroke-width:1px
+        style D fill:#d9e8ff,stroke:#4a78c2,stroke-width:1px
+        style G fill:#d9e8ff,stroke:#4a78c2,stroke-width:1px
+        style K fill:#d9e8ff,stroke:#4a78c2,stroke-width:1px
+
+        style B fill:#e8f5e9,stroke:#2e7d32
+        style C fill:#e8f5e9,stroke:#2e7d32
+        style E fill:#e8f5e9,stroke:#2e7d32
+        style F fill:#e8f5e9,stroke:#2e7d32
+        style H fill:#e8f5e9,stroke:#2e7d32
+        style I fill:#e8f5e9,stroke:#2e7d32
+        style L fill:#e8f5e9,stroke:#2e7d32
+        style J fill:#fff3cd,stroke:#b8860b
+
