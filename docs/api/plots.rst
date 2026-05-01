@@ -1,77 +1,25 @@
-Plots API Reference
-===================
+Plotting API
+============
 
-This section documents the full plotting subsystem of
-``ufs_da_diagnostics.plots``.  
-It includes ATMS diagnostics, scalar/vector histograms, spectral
-diagnostics, QC plots, and shared utilities.
+This section documents the plotting subsystem used throughout
+``ufs-da-diagnostics``. It includes:
 
-All modules are listed below with their public classes and functions.
+- Observation diagnostics plotting (ATMS, scalar, vector)
+- Spectral diagnostics (1D/2D spectra)
+- Shared plotting utilities
 
-.. contents::
-   :local:
-   :depth: 2
-
-
-ATMS Diagnostics
-----------------
-
-ATMS Histograms
-^^^^^^^^^^^^^^^
-
-.. automodule:: ufs_da_diagnostics.plots.atms_hist
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ATMS Latitude-Binned Diagnostics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: ufs_da_diagnostics.plots.atms_latbins
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ATMS Scan-Position Diagnostics
-^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: ufs_da_diagnostics.plots.atms_scan_position
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ATMS Channel Statistics
-^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: ufs_da_diagnostics.plots.atms_stats
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-ATMS Extended Statistics
-^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: ufs_da_diagnostics.plots.atms_stats_extended
-   :members:
-   :undoc-members:
-   :show-inheritance:
+These modules are used internally by the YAML‑driven diagnostics driver
+and can also be imported directly for custom workflows.
 
 
-Scalar & Vector Diagnostics
----------------------------
+Observation Diagnostics Plotter
+-------------------------------
 
-Scalar Histograms
-^^^^^^^^^^^^^^^^^^
+The ``ObsDiagPlotter`` class orchestrates all observation‑space
+diagnostics, including histograms, statistics, scan‑position diagnostics,
+and latitude‑binned plots.
 
-.. automodule:: ufs_da_diagnostics.plots.scalar_hist
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Vector Histograms
-^^^^^^^^^^^^^^^^^^
-
-.. automodule:: ufs_da_diagnostics.plots.vector_hist
+.. automodule:: ufs_da_diagnostics.plots.obs_diag_plotter
    :members:
    :undoc-members:
    :show-inheritance:
@@ -80,63 +28,29 @@ Vector Histograms
 Spectral Diagnostics
 --------------------
 
+The ``SpectraPlotter`` class provides tools for computing and plotting
+spectra from FV3‑JEDI increment and background fields.
+
 .. automodule:: ufs_da_diagnostics.plots.spectra_plots
    :members:
    :undoc-members:
    :show-inheritance:
 
 
-QC Diagnostics
---------------
+Shared Plot Utilities
+---------------------
 
-.. automodule:: ufs_da_diagnostics.plots.qc_plots
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Plot Orchestrator
------------------
-
-.. automodule:: ufs_da_diagnostics.plots.obs_diag_plotter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Base Plotter
-------------
-
-.. automodule:: ufs_da_diagnostics.plots.base_plotter
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-
-Shared Utilities
-----------------
-
-Common Plotting Utilities
-^^^^^^^^^^^^^^^^^^^^^^^^^
-
-.. automodule:: ufs_da_diagnostics.plots.utils_common
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-Loader Utilities
-^^^^^^^^^^^^^^^^
-
-.. automodule:: ufs_da_diagnostics.plots.utils_loaders
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-General Utilities
-^^^^^^^^^^^^^^^^^
+Common helper functions used across the plotting subsystem.
 
 .. automodule:: ufs_da_diagnostics.plots.utils
    :members:
    :undoc-members:
    :show-inheritance:
 
+
+Related Usage Pages
+-------------------
+
+- :doc:`../usage_observation_tools` — Observation diagnostics workflow  
+- :doc:`../usage_spectra` — Spectral diagnostics workflow  
+- :doc:`../usage_increment` — Increment maps and zonal means  
