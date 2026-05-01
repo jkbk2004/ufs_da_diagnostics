@@ -1,8 +1,29 @@
 #!/usr/bin/env python3
 """
-Vector observation histograms:
-  - SATWND, SCATWND, or any u/v wind components
-  - Produces two histograms: u and v
+Vector Observation Histograms
+=============================
+
+This module provides histogram diagnostics for **vector observations**
+such as:
+
+- SATWND (u/v wind components)
+- SCATWND
+- Any observation type stored as a 2‑component vector (u, v)
+
+The diagnostics produce **two histograms**:
+
+1. U‑component (eastward wind)
+2. V‑component (northward wind)
+
+Both histograms include:
+
+- OMB histogram (QC2==0)
+- KDE overlays for OMB and OMA
+- Adaptive bin selection
+- Assimilated‑count annotation
+
+This module is used by the observation diagnostics orchestrator and
+mirrors the behavior of scalar and ATMS histogram routines.
 """
 
 import os
@@ -14,10 +35,35 @@ from .utils_loaders import load_qc_any, load_omb, load_oma_explicit
 from .utils_common import make_output_dir, annotate_assimilated, kde_safe
 
 
+# ----------------------------------------------------------------------
+# Component extraction
+# ----------------------------------------------------------------------
+
 def _extract_uv(omb, oma):
     """
     Split OMB/OMA arrays into u and v components.
-    Assumes last dimension = 2 (u, v).
+
+    Parameters
+    ----------
+    omb : numpy.ndarray
+        OMB array of shape (nlocs, 2).
+    oma : numpy.ndarray
+        OMA array of shape (nlocs, 2).
+
+    Returns
+    -------
+    tuple of numpy.ndarray
+        (u_omb, v_omb, u_oma, v_oma)
+
+    Raises
+    ------
+    ValueError
+        If the input arrays are not 2‑component vectors.
+
+    Notes
+    -----
+    - This function assumes the last dimension is ordered as (u, v).
+    - Used internally by ``plot_vector_hist``.
     """
     if omb.ndim != 2 or omb.shape[1] != 2:
         raise ValueError("Expected OMB shape (nlocs, 2) for vector obs")
@@ -25,9 +71,32 @@ def _extract_uv(omb, oma):
     return omb[:, 0], omb[:, 1], oma[:, 0], oma[:, 1]
 
 
+# ----------------------------------------------------------------------
+# Component plotting helper
+# ----------------------------------------------------------------------
+
 def _plot_component(ax, data_omb, data_oma, nbins, title):
     """
-    Plot a single component histogram + KDE.
+    Plot a single vector component histogram with KDE overlays.
+
+    Parameters
+    ----------
+    ax : matplotlib.axes.Axes
+        Axis on which to draw the histogram.
+    data_omb : array-like
+        OMB values for the component.
+    data_oma : array-like
+        OMA values for the component.
+    nbins : int
+        Number of histogram bins.
+    title : str
+        Title for the subplot.
+
+    Notes
+    -----
+    - KDE curves are drawn using ``kde_safe`` to avoid failures on
+      degenerate distributions.
+    - Histogram is normalized to density.
     """
     ax.hist(data_omb, bins=nbins, color="lightgrey",
             edgecolor=None, alpha=0.7, density=True)
@@ -42,9 +111,50 @@ def _plot_component(ax, data_omb, data_oma, nbins, title):
     ax.legend(fontsize=8)
 
 
+# ----------------------------------------------------------------------
+# Main vector histogram routine
+# ----------------------------------------------------------------------
+
 def plot_vector_hist(f, varname, label, outdir):
     """
-    Plot u and v component histograms for vector wind obs.
+    Plot U and V component histograms for vector wind observations.
+
+    This function generates a **two‑panel figure**:
+
+    - Left panel: U‑component histogram
+    - Right panel: V‑component histogram
+
+    Both panels include:
+
+    - OMB histogram (QC2==0)
+    - KDE overlays for OMB and OMA
+    - Adaptive bin selection based on combined U/V spread
+    - Assimilated‑count annotation
+
+    Parameters
+    ----------
+    f : xarray.Dataset or dict-like
+        Observation diagnostics file containing OMB, OMA, QC.
+    varname : str
+        Name of the vector variable (e.g., ``"windEastward"`` is not used
+        here; instead, the file must store a 2‑component vector under
+        ``varname``).
+    label : str
+        Short label used in plot titles and output filenames.
+    outdir : str
+        Directory where the output PNG file will be written.
+
+    Notes
+    -----
+    - Expected OMB/OMA shape is ``(nlocs, 2)``.
+    - QC is assumed to be 1‑D (Location) for vector winds.
+    - QC2 filtering is applied using ``load_qc_any``.
+    - One PNG file is produced: ``<label>_vector_hist.png``.
+
+    Returns
+    -------
+    None
+        A PNG file is written to ``outdir``.
     """
     make_output_dir(outdir)
 
@@ -97,3 +207,4 @@ def plot_vector_hist(f, varname, label, outdir):
     fig.savefig(fname, dpi=150)
     plt.close(fig)
     print(f"[SAVED] {fname}")
+
