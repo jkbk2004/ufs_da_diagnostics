@@ -1,42 +1,46 @@
-Increment Maps API
-==================
+Increment Diagnostics API
+=========================
 
-The increment maps subsystem provides tools for generating horizontal
-FV3 6‑tile increment maps and zonal‑mean diagnostics from FV3‑JEDI
-analysis increment files. It supports both single‑experiment and
-two‑experiment (CTRL–EXP–DIFF) workflows and is fully YAML‑driven.
+This module provides tools for generating tile‑based increment maps and
+zonal‑mean diagnostics from FV3‑JEDI increment files. These diagnostics
+are used to visualize spatial increment structure and compare
+experiment‑to‑experiment differences.
 
-This API reference documents the public functions and internal helpers
-implemented in:
-
-``ufs_da_diagnostics.increment.increment_maps_tiles``
-
-For usage examples and YAML configuration details, see:
-
-- :doc:`../usage_increment`
+The increment plotting routines are used internally by the increment
+driver and can also be imported directly for custom workflows.
 
 
-Module Summary
---------------
-
-.. autosummary::
-   :toctree: generated/
-   :nosignatures:
-
-   ufs_da_diagnostics.increment.increment_maps_tiles.load_yaml_config
-   ufs_da_diagnostics.increment.increment_maps_tiles.load_tile_increment
-   ufs_da_diagnostics.increment.increment_maps_tiles.stitch_tiles_to_latlon
-   ufs_da_diagnostics.increment.increment_maps_tiles.compute_zonal_mean
-   ufs_da_diagnostics.increment.increment_maps_tiles.plot_increment_map
-   ufs_da_diagnostics.increment.increment_maps_tiles.plot_zonal_mean
-   ufs_da_diagnostics.increment.increment_maps_tiles.main
-
-
-Full Module Documentation
+Tile‑Based Increment Maps
 -------------------------
+
+The ``increment_maps_tiles`` module generates:
+
+- Tile‑based increment maps for ``u``, ``v``, ``t``, ``ps`` and other variables
+- Multi‑panel figures for single or dual‑experiment comparisons
+- Optional zonal‑mean diagnostics
+- Automatic handling of FV3 cubed‑sphere tile geometry
 
 .. automodule:: ufs_da_diagnostics.increment.increment_maps_tiles
    :members:
    :undoc-members:
    :show-inheritance:
-   :noindex:
+
+
+Increment Core Utilities
+------------------------
+
+Core helper functions used for reading increment files, extracting
+variables, and preparing fields for plotting.
+
+.. automodule:: ufs_da_diagnostics.increment.increment_core
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
+
+Related Usage Pages
+-------------------
+
+- :doc:`../usage_increment` — Increment maps and zonal‑mean workflow  
+- :doc:`../usage_spectra` — Spectral diagnostics  
+- :doc:`../usage_observation_tools` — Observation diagnostics  
