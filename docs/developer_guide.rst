@@ -224,3 +224,21 @@ Developer Resources
 - :doc:`api/spectra` — Spectral diagnostics  
 - :doc:`api/obs_diagnostic` — Observation diagnostics driver  
 - :doc:`api/log` — Log parsing tools  
+
+Example YAML Library
+--------------------
+
+The package includes a set of example YAML files under:
+
+``ufs_da_diagnostics/examples/``
+
+These serve as canonical templates for developers:
+
+- ``diag_fv3-jedi-bkg_inc.yaml`` — Spectral diagnostics (background–increment)
+- ``diag_fv3-jedi_obs.yaml`` — Observation diagnostics
+- ``diag_fv3-jedi-tiles.yaml`` — Increment maps and zonal means
+
+When adding new diagnostics or extending existing ones, update or add
+example YAMLs to ensure users have clear, working templates.
+
+
