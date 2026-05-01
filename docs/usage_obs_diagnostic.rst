@@ -1,53 +1,32 @@
-Observation Diagnostics Driver
-==============================
+Observation Diagnostics
+=======================
 
-This page describes how to run the observation‑level diagnostics using
-the command‑line driver ``obs_diagnostic.py``. This tool reads a YAML
-configuration file and generates histograms, statistics, and other
-diagnostics for ATMS, scalar, and vector observations.
+This page describes how to run the observation‑space diagnostics included
+in ``ufs-da-diagnostics``. These diagnostics generate histograms,
+statistics, and specialized plots for ATMS, scalar, and vector
+observations from FV3‑JEDI IODA diagnostic files.
 
-The driver is a thin wrapper around the ``ObsDiagPlotter`` orchestrator.
-
-
-Overview
---------
-
-The driver performs the following steps:
-
-1. Reads a YAML configuration file.
-2. Loads the observation diagnostics NetCDF files.
-3. Dispatches diagnostics based on observation type:
-   - ATMS radiances
-   - Scalar observations (e.g., radiosonde temperature)
-   - Vector observations (e.g., SATWND/SCATWND winds)
-4. Writes plots into the specified output directories.
-
-All QC handling, OMB/OMA loading, and plotting logic is handled
-internally by the diagnostics subsystem.
+All observation diagnostics are driven by a YAML configuration file and
+executed using the command‑line driver.
 
 
-Command‑Line Usage
+Running the Driver
 ------------------
 
-Run the driver with:
+Use the ``obs_diagnostic`` driver to run all requested diagnostics:
 
 .. code-block:: bash
 
-    $ python -m ufs_da_diagnostics.obs.obs_diagnostic --yaml obs_plots.yaml
+    python -m ufs_da_diagnostics.obs.obs_diagnostic --yaml obs_plots.yaml
 
-or, if installed as a script:
-
-.. code-block:: bash
-
-    $ obs_diagnostic.py --yaml obs_plots.yaml
-
-The ``--yaml`` argument is required.
+The ``--yaml`` argument is required and points to a configuration file
+describing the observations to process.
 
 
 YAML Configuration
 ------------------
 
-The YAML file controls all diagnostics. Example:
+A minimal example covering ATMS, scalar, and vector observations:
 
 .. code-block:: yaml
 
@@ -80,27 +59,44 @@ The YAML file controls all diagnostics. Example:
         diagnostics:
           hist: true
 
+Each entry defines:
 
-Driver Internals
-----------------
-
-The driver consists of two functions:
-
-``parse_args()``  
-    Parses the ``--yaml`` argument.
-
-``main()``  
-    Loads the YAML file, constructs an ``ObsDiagPlotter`` instance, and
-    runs all diagnostics.
-
-The driver does not contain plotting logic; it simply forwards the
-configuration to the plotting subsystem.
+- ``label`` — name used in plot titles and filenames  
+- ``type`` — ``atms``, ``scalar``, or ``vector``  
+- ``variable`` — variable name inside the diagnostics file  
+- ``file`` — path to the IODA diagnostics file  
+- ``outdir`` — output directory for plots  
+- ``diagnostics`` — which diagnostics to run  
 
 
-Example Output
---------------
+Available Diagnostics
+---------------------
 
-After running the driver, the output directory may look like:
+ATMS
+^^^^
+
+- Channel histograms  
+- Mean/Std statistics  
+- Extended statistics (RMS, NRMS, BC‑RMS)  
+- Scan‑position diagnostics  
+- Latitude‑binned diagnostics  
+
+Scalar
+^^^^^^
+
+- OMB histogram (QC2)  
+- If OMB is missing, an ObsValue histogram is produced  
+
+Vector
+^^^^^^
+
+- U‑component histogram  
+- V‑component histogram  
+- Both appear in a single figure  
+
+
+Example Output Structure
+------------------------
 
 .. code-block:: text
 
@@ -124,7 +120,8 @@ Notes
 
 - QC2 filtering is applied automatically.
 - Missing OMB/OMA fields are handled gracefully.
-- ATMS diagnostics include channel shading and group legends.
+- ATMS shading and legends follow NOAA conventions.
 - Vector diagnostics require 2‑component variables.
 
-This completes the usage instructions for the observation diagnostics driver.
+This completes the usage workflow for observation‑space diagnostics.
+
