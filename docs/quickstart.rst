@@ -1,9 +1,11 @@
+
 Quickstart
 ==========
 
 This page provides a fast introduction to installing and using the
 ``ufs-da-diagnostics`` package. The goal is to help you run your first
 diagnostic plot or increment visualization in just a few steps.
+
 
 Prerequisites
 -------------
@@ -18,6 +20,7 @@ You will need:
 If you installed the package using ``pip install .`` these dependencies
 are already handled.
 
+
 Basic Usage
 -----------
 
@@ -27,33 +30,89 @@ modules through the unified namespace:
 .. code-block:: python
 
     import ufs_da_diagnostics as udiag
+    print("Diagnostics package loaded:", udiag)
 
-    # Example: run an observation diagnostic plotter
-    udiag.obs_diag_plotter("path/to/obs/diagnostic/file.nc")
+Diagnostics are organized into three major components:
 
-    # Example: run an increment tile plot
-    udiag.increment_maps_tiles("path/to/increment/file.nc")
+- **Observation diagnostics** (ATMS, scalar, vector)
+- **Increment diagnostics** (tile maps, zonal means)
+- **Spectral diagnostics** (1D/2D spectra)
 
-Modules Overview
-----------------
 
-The package is organized into two main components:
+Running Observation Diagnostics
+-------------------------------
 
-- **plots/** — ATMS, H(x), innovations, spectra, QC, and other
-  observation-based diagnostics
-- **increment/** — increment visualization tools such as tile-based
-  increment maps
+Observation diagnostics are driven by a YAML configuration file. Example:
 
-To explore available functions:
+.. code-block:: yaml
+
+    observations:
+      - label: ATMS
+        type: atms
+        variable: brightness_temperature
+        file: diag_atms.nc
+        outdir: ./plots/atms
+        diagnostics:
+          hist: true
+          stats: true
+
+Save this as ``obs_plots.yaml`` and run:
+
+.. code-block:: bash
+
+    python -m ufs_da_diagnostics.obs.obs_diagnostic --yaml obs_plots.yaml
+
+This will generate histograms, statistics, and other diagnostics in the
+specified output directory.
+
+See :doc:`usage_plots` for the full workflow.
+
+
+Running Increment Diagnostics
+-----------------------------
+
+Increment maps are generated using the tile‑based increment plotter:
+
+.. code-block:: bash
+
+    python -m ufs_da_diagnostics.increment.increment_maps_tiles \
+        --yaml increment_config.yaml
+
+A minimal YAML example:
+
+.. code-block:: yaml
+
+    increments:
+      file: fv3_increment.nc
+      outdir: ./plots/increment
+      variables: [u, v, t, ps]
+
+See :doc:`usage_increment` for details.
+
+
+Running Spectral Diagnostics
+----------------------------
+
+Spectral diagnostics use the ``SpectraPlotter`` class:
 
 .. code-block:: python
 
-    import ufs_da_diagnostics as udiag
-    dir(udiag)
+    from ufs_da_diagnostics.plots.spectra_plots import SpectraPlotter
+
+    plotter = SpectraPlotter()
+    plotter.plot_spectra(core, level=50,
+                         ctrl_name="CTRL",
+                         exp_name="EXP",
+                         fname="spectra_level50.png")
+
+See :doc:`usage_spectra` for full examples.
+
 
 Next Steps
 ----------
 
 - See :doc:`installation` for setup instructions
-- See :doc:`api/plots` for observation diagnostics API
-- See :doc:`api/increment` for increment diagnostics API
+- See :doc:`usage_plots` for observation diagnostics
+- See :doc:`usage_increment` for increment diagnostics
+- See :doc:`usage_spectra` for spectral diagnostics
+- See :doc:`api/plots` and :doc:`api/increment` for API details
