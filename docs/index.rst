@@ -47,3 +47,20 @@ Use the navigation on the left to explore the User Guide and API Reference.
    :caption: Developer Guide
 
    developer_guide
+
+Example YAML Files
+------------------
+
+The package includes ready-to-run example YAML configurations under:
+
+``ufs_da_diagnostics/examples/``
+
+These templates demonstrate the expected structure for each diagnostics subsystem:
+
+- ``diag_fv3-jedi-bkg_inc.yaml`` — Background–increment spectral diagnostics
+- ``diag_fv3-jedi_obs.yaml`` — Observation-space diagnostics
+- ``diag_fv3-jedi-tiles.yaml`` — Increment maps and zonal-mean diagnostics
+
+You can copy and modify these files to create your own diagnostic workflows.
+
+
