@@ -1,3 +1,22 @@
+"""
+Scalar Observation Histograms
+=============================
+
+This module provides histogram diagnostics for **scalar observation
+types** (e.g., temperature, humidity, pressure). It supports two modes:
+
+1. **Standard scalar diagnostics**  
+   - OMB histogram (QC2==0)
+   - Optional OMA overlay (if available)
+
+2. **GNSSRO fallback mode**  
+   - If OMB is missing (common for GNSSRO), the histogram is generated
+     from ``ObsValue`` only.
+
+QC2 filtering is applied consistently, and all arrays are flattened
+before histogramming.
+"""
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -9,7 +28,46 @@ from .utils_loaders import (
     load_oma_explicit,
 )
 
+
 def plot_scalar_hist(f, varname, label, outdir):
+    """
+    Plot histogram diagnostics for scalar observations.
+
+    This function supports two workflows:
+
+    **1. GNSSRO fallback mode**  
+       If OMB is missing, the function plots a histogram of ``ObsValue``
+       only. This matches the behavior of legacy GNSSRO diagnostics.
+
+    **2. Standard scalar mode**  
+       If OMB exists, the function plots:
+       - OMB histogram (QC2==0)
+       - Optional OMA overlay (if available)
+
+    Parameters
+    ----------
+    f : xarray.Dataset or dict-like
+        Observation diagnostics file containing QC, ObsValue, OMB, OMA.
+    varname : str
+        Name of the scalar variable (e.g., ``"air_temperature"``).
+    label : str
+        Short label used in plot titles and output filenames.
+    outdir : str
+        Directory where output PNG files will be written.
+
+    Notes
+    -----
+    - QC2 filtering is applied using ``load_qc_any``.
+    - All arrays are flattened before histogramming.
+    - KDE is not used here (unlike unified histograms) to preserve
+      legacy behavior.
+    - One PNG file is produced per variable.
+
+    Returns
+    -------
+    None
+        A PNG file is written to ``outdir``.
+    """
     os.makedirs(outdir, exist_ok=True)
 
     qc2 = load_qc_any(f, varname)
