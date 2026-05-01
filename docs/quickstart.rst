@@ -116,3 +116,20 @@ Next Steps
 - See :doc:`usage_increment` for increment diagnostics
 - See :doc:`usage_spectra` for spectral diagnostics
 - See :doc:`api/plots` and :doc:`api/increment` for API details
+
+
+Example YAML Files
+------------------
+
+Example configuration files are included with the package under:
+
+``ufs_da_diagnostics/examples/``
+
+These provide ready-to-run templates for each diagnostics subsystem:
+
+- ``diag_fv3-jedi-bkg_inc.yaml`` — Background–increment spectral diagnostics
+- ``diag_fv3-jedi_obs.yaml`` — Observation-space diagnostics
+- ``diag_fv3-jedi-tiles.yaml`` — Increment maps and zonal-mean diagnostics
+
+You can copy and modify these files to match your workflow.
+
