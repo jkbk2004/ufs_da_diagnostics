@@ -33,6 +33,7 @@ Use the navigation on the left to explore the User Guide and API Reference.
    :maxdepth: 2
    :caption: API Reference
 
+   api/overview
    api/spectra
    api/increment
    api/plots
