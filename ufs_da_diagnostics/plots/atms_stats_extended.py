@@ -1,3 +1,36 @@
+"""
+Extended ATMS Channel‑Wise OMB/OMA Statistics
+=============================================
+
+This module computes an extended set of per‑channel OMB/OMA diagnostics
+for ATMS radiance observations using QC2 filtering. It expands upon the
+basic ATMS statistics by including:
+
+- Mean OMB / OMA
+- Standard deviation OMB / OMA
+- RMS OMB / OMA
+- RMS difference (OMA – OMB)
+- Normalized RMS (NRMS)
+- Bias‑corrected RMS (BC‑RMS)
+
+The output is a **4‑panel diagnostic figure**:
+
+1. Mean & Std (dual y‑axes)
+2. RMS
+3. RMS Difference
+4. Normalized RMS & Bias‑Corrected RMS
+
+Channel groups (Window, O₂, H₂O) are shaded for interpretability.
+
+Output
+------
+A single PNG file:
+
+    <label>_stats_extended.png
+
+saved in the specified output directory.
+"""
+
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -10,6 +43,23 @@ from .utils_loaders import load_omb, load_oma_explicit, load_qc_universal
 # Correct ATMS channel groups
 # ---------------------------------------------------------------------
 def channel_groups():
+    """
+    Return ATMS channel group definitions for shading and legends.
+
+    Returns
+    -------
+    list of tuples
+        Each tuple contains:
+        (group_name, start_channel, end_channel, color)
+
+    Notes
+    -----
+    ATMS channel grouping:
+
+    - Window: channels 1–2 and 16–17
+    - O₂ Temperature: channels 3–15
+    - H₂O: channels 18–22
+    """
     return [
         ("Window", 1, 2, "lightgrey"),
         ("O₂ Temp", 3, 15, "lightblue"),
@@ -22,6 +72,42 @@ def channel_groups():
 # Extended ATMS Stats
 # ---------------------------------------------------------------------
 def plot_stats_atms_extended(f, varname, label, outdir):
+    """
+    Plot extended ATMS per‑channel OMB/OMA diagnostics (QC2‑filtered).
+
+    This function computes and visualizes an extended suite of
+    per‑channel statistics:
+
+    - Mean OMB / OMA
+    - Std  OMB / OMA
+    - RMS  OMB / OMA
+    - RMS difference (OMA – OMB)
+    - Normalized RMS (NRMS = RMS / Std)
+    - Bias‑corrected RMS (BC‑RMS = Std)
+
+    Parameters
+    ----------
+    f : xarray.Dataset or dict-like
+        Observation diagnostics file containing OMB, OMA, QC, and metadata.
+    varname : str
+        Variable name for ATMS radiances (e.g., ``"brightness_temperature"``).
+    label : str
+        Short label used in plot titles and output filenames.
+    outdir : str
+        Directory where the output PNG file will be saved.
+
+    Notes
+    -----
+    - QC mask is applied per (Location, Channel).
+    - If QC is 1‑D, it is broadcast to match the number of channels.
+    - Channels are assumed to be 1‑indexed for plotting.
+    - One PNG file is produced containing all four panels.
+
+    Returns
+    -------
+    None
+        A single PNG file is written to ``outdir``.
+    """
     os.makedirs(outdir, exist_ok=True)
 
     omb = load_omb(f, varname)
@@ -32,6 +118,7 @@ def plot_stats_atms_extended(f, varname, label, outdir):
         print(f"[SKIP] {label} ATMS extended stats: missing OMB/OMA")
         return
 
+    # Broadcast QC if needed
     if qc.ndim == 1:
         qc = np.repeat(qc[:, None], omb.shape[1], axis=1)
 
@@ -95,16 +182,14 @@ def plot_stats_atms_extended(f, varname, label, outdir):
             ax.axvspan(c1 - 0.5, c2 + 0.5, color=color, alpha=0.25, zorder=0)
     
     # -------------------------
-    # Panel 1: Mean & Std (dual y-axes)
+    # Panel 1: Mean & Std
     # -------------------------
     shade(ax_meanstd)
 
-    # Left axis = Mean
     ax_meanstd.plot(chans, mean_omb, "o-", color="blue", label="Mean OMB")
     ax_meanstd.plot(chans, mean_oma, "o-", color="red", label="Mean OMA")
     ax_meanstd.set_ylabel("Mean")
 
-    # Right axis = Std
     ax_std = ax_meanstd.twinx()
     ax_std.plot(chans, std_omb, "s--", color="orange", label="Std OMB")
     ax_std.plot(chans, std_oma, "s--", color="purple", label="Std OMA")
@@ -113,11 +198,9 @@ def plot_stats_atms_extended(f, varname, label, outdir):
     ax_meanstd.set_title("Mean & Std (OMB / OMA)")
     ax_meanstd.set_xlabel("Channel")
     
-    # Combined legend (upper-left)
+    # Combined legend
     lines1, labels1 = ax_meanstd.get_legend_handles_labels()
     lines2, labels2 = ax_std.get_legend_handles_labels()
-
-    # Combined legend (upper-left)
     leg1 = ax_meanstd.legend(
         lines1 + lines2,
         labels1 + labels2,
@@ -125,9 +208,9 @@ def plot_stats_atms_extended(f, varname, label, outdir):
         fontsize=8,
         frameon=True
     )
-    ax_meanstd.add_artist(leg1)   # <-- KEEP THIS LEGEND
+    ax_meanstd.add_artist(leg1)
 
-    # Channel-group legend (bottom-right)
+    # Channel-group legend
     ax_meanstd.legend(
         handles=[
             Patch(facecolor="lightgrey", label="Window (1–2, 16–17)"),
@@ -148,7 +231,7 @@ def plot_stats_atms_extended(f, varname, label, outdir):
     ax_rms.set_title("RMS (OMB / OMA)")
     ax_rms.set_xlabel("Channel")
     ax_rms.set_ylabel("RMS")
-    ax_rms.legend(loc="upper left", fontsize=8)       # <--- ADDED
+    ax_rms.legend(loc="upper left", fontsize=8)
 
     # -------------------------
     # Panel 3: RMS Difference
@@ -158,30 +241,15 @@ def plot_stats_atms_extended(f, varname, label, outdir):
     ax_rmsdiff.set_title("RMS Difference (OMA – OMB)")
     ax_rmsdiff.set_xlabel("Channel")
     ax_rmsdiff.set_ylabel("Difference")
-    ax_rmsdiff.legend(loc="lower left", fontsize=8)   # <--- ADDED
+    ax_rmsdiff.legend(loc="lower left", fontsize=8)
     
-    # -------------------------
-    # Panel 4: Normalized + BC RMS
-    # -------------------------
-    #shade(ax_norm)
-    #ax_norm.plot(chans, nrms_omb, "^-", color="black", label="NRMS OMB")
-    #ax_norm.plot(chans, nrms_oma, "^-", color="magenta", label="NRMS OMA")
-    #ax_norm.plot(chans, bc_rms_omb, "s--", color="orange", label="BC-RMS OMB (Std)")
-    #ax_norm.plot(chans, bc_rms_oma, "s--", color="purple", label="BC-RMS OMA (Std)")
-    #ax_norm.set_title("Normalized RMS & Bias-Corrected RMS")
-    #ax_norm.set_xlabel("Channel")
-    #ax_norm.set_ylabel("Value")
-    #ax_norm.legend(loc="upper left", fontsize=8)      # <--- ADDED
     # -------------------------
     # Panel 4: Normalized + BC RMS
     # -------------------------
     shade(ax_norm)
 
-    # NRMS
     ax_norm.plot(chans, nrms_omb, "^-", color="black", label="NRMS OMB")
     ax_norm.plot(chans, nrms_oma, "^-", color="magenta", label="NRMS OMA")
-
-    # BC-RMS
     ax_norm.plot(chans, bc_rms_omb, "s--", color="orange", label="BC-RMS OMB")
     ax_norm.plot(chans, bc_rms_oma, "s--", color="purple", label="BC-RMS OMA")
 
@@ -199,20 +267,7 @@ def plot_stats_atms_extended(f, varname, label, outdir):
     yr = ymax - ymin
     ax_norm.set_ylim(ymin - 0.1 * yr, ymax + 0.1 * yr)
 
-    # Legend
     ax_norm.legend(loc="upper right", fontsize=8)
-
-    
-    # -----------------------------------------------------------------
-    # Legend (bottom-right)
-    # -----------------------------------------------------------------
-    handles = []
-    labels = []
-    for name, _, _, color in channel_groups():
-        handles.append(plt.Rectangle((0, 0), 1, 1, color=color, alpha=0.25))
-        labels.append(name)
-
-    #fig.legend(handles, labels, loc="lower right", fontsize=9)
 
     # -----------------------------------------------------------------
     # Title
