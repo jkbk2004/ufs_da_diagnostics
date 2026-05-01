@@ -2,10 +2,23 @@
 """
 JEDI Log Parser — Comprehensive Diagnostic Report Generator
 ============================================================
-Parses a JEDI variational DA log file and produces a full diagnostic report.
 
-Usage:
-    python parse_jedi_log.py <jedi_log_file> [--output report.txt]
+This module parses a JEDI variational DA log file and extracts:
+
+- Configuration metadata (cost type, analysis time, resolutions, weights)
+- Observation counts (loaded, total, assimilated, per‑variable)
+- Jo/n evolution across outer loops
+- Cost‑function convergence (J, Jb, JoJc)
+- Departures (Min/Max/RMS)
+- Observation error statistics
+- A full human‑readable diagnostic report
+
+It is designed to support FV3‑JEDI variational DA workflows and provides
+a compact summary of the assimilation performance.
+
+Typical usage:
+
+    python parse_jedi_log.py jedi.log --output report.txt
 """
 
 import re
@@ -13,8 +26,33 @@ import sys
 import argparse
 from collections import OrderedDict
 
-
 def parse_configuration(lines):
+    """Parse high‑level configuration metadata from a JEDI log.
+
+    Parameters
+    ----------
+    lines : list of str
+        Full log file read as a list of lines.
+
+    Returns
+    -------
+    dict
+        Dictionary containing extracted configuration fields, including:
+        - cost_type
+        - analysis_time
+        - window_begin, window_length
+        - outer_resolution, inner_resolution
+        - nlevels
+        - static_weight, ensemble_weight
+        - ensemble_members
+        - minimizer
+        - ninner (list of inner iterations per outer loop)
+
+    Notes
+    -----
+    Only the first ~200 lines are scanned because configuration metadata
+    always appears at the top of JEDI logs.
+    """
     config = {}
     full_text = "\n".join(lines[:200])
 
@@ -56,6 +94,32 @@ def parse_configuration(lines):
 
 
 def parse_obs_counts(lines):
+    """Parse observation counts from a JEDI log.
+
+    Parameters
+    ----------
+    lines : list of str
+        Log file lines.
+
+    Returns
+    -------
+    OrderedDict
+        Mapping of observation type → statistics:
+        - nlocs: loaded locations
+        - nobs_total: total obs before QC
+        - nobs_assimilated: obs used in Jo
+        - nobs_per_var: per‑variable assimilated counts
+
+    Notes
+    -----
+    This function scans multiple sections of the log:
+    - “nlocs = …, nobs = …” lines
+    - “CostJo Observations” block
+    - First “CostJo: Nonlinear” block
+    - “Jo Obs:” per‑variable lines
+
+    The parser is robust to ordering differences across JEDI versions.
+    """
     obs_counts = OrderedDict()
 
     # Total loaded locations (nlocs)
@@ -74,7 +138,7 @@ def parse_obs_counts(lines):
                 }
             obs_counts[obs_type]['nlocs'] = nlocs
 
-    # Total obs before QC (from "CostJo Observations" block)
+    # Total obs before QC (CostJo Observations block)
     costjo_obs_pattern = re.compile(r'^(\S+(?:\s+\S+)?)\s+nobs=\s*(\d+)\s+Min=')
     in_costjo_obs = False
     seen_total = set()
@@ -100,7 +164,7 @@ def parse_obs_counts(lines):
             if 'Jo Observations:' in stripped and 'CostJo' not in stripped:
                 break
 
-    # Assimilated obs (from first CostJo Nonlinear block)
+    # Assimilated obs (first CostJo Nonlinear block)
     costjo_pattern = re.compile(
         r'CostJo\s*:\s*Nonlinear\s+Jo\((.+?)\)\s*=\s*([\d.e+\-]+),\s*nobs\s*=\s*(\d+)'
     )
@@ -115,7 +179,7 @@ def parse_obs_counts(lines):
                     obs_counts[obs_type]['nobs_assimilated'] = nobs
                 seen_first.add(obs_type)
 
-    # Per-variable assimilated obs (from Jo Obs lines)
+    # Per‑variable assimilated obs
     jo_obs_pattern = re.compile(
         r'Jo Obs\s*:(\S+(?:\s+\S+)?):(\S+)\s*:\s*Nobs=\s*(\d+)'
     )
@@ -132,8 +196,39 @@ def parse_obs_counts(lines):
 
     return obs_counts
 
-
 def parse_jo_evolution(lines):
+    """Parse Jo evolution across outer iterations.
+
+    Parameters
+    ----------
+    lines : list of str
+        Log file lines.
+
+    Returns
+    -------
+    jo_data : OrderedDict
+        Mapping of obs_type → list of records, each containing:
+        - Jo : float
+        - nobs : int
+        - Jo_n : float (Jo/n)
+        - err : float
+    jo_total : list of float
+        Total Jo values across outer loops (not per‑obs‑type).
+
+    Notes
+    -----
+    This function extracts two types of information:
+
+    1. **Per‑observation‑type Jo evolution**
+       From lines like:
+           ``CostJo : Nonlinear Jo(AMSUA) = 1234, nobs = 567, Jo/n = 2.17, err = ...``
+
+    2. **Total Jo evolution**
+       From lines like:
+           ``CostJo : Nonlinear Jo = 34567``
+
+    The parser is robust to ordering differences across JEDI versions.
+    """
     costjo_pattern = re.compile(
         r'CostJo\s*:\s*Nonlinear\s+Jo\((.+?)\)\s*=\s*([\d.e+\-]+),\s*nobs\s*=\s*(\d+),\s*Jo/n\s*=\s*([\d.e+\-]+),\s*err\s*=\s*([\d.e+\-]+)'
     )
@@ -159,6 +254,33 @@ def parse_jo_evolution(lines):
 
 
 def parse_cost_convergence(lines):
+    """Parse cost‑function convergence (J, Jb, JoJc) across inner/outer loops.
+
+    Parameters
+    ----------
+    lines : list of str
+        Log file lines.
+
+    Returns
+    -------
+    list of list of dict
+        A list of outer loops, each containing a list of iteration records:
+        - iter : int
+        - J : float
+        - Jb : float
+        - JoJc : float
+
+    Notes
+    -----
+    JEDI prints cost‑function values in blocks like:
+
+        Quadratic cost function: J(0) = ...
+        Quadratic cost function: Jb(0) = ...
+        Quadratic cost function: JoJc(0) = ...
+
+    The parser groups these into outer loops by detecting when iteration
+    counters reset to zero.
+    """
     j_pattern = re.compile(r'Quadratic cost function:\s*J\s*\(\s*(\d+)\)\s*=\s*([\d.e+\-]+)')
     jb_pattern = re.compile(r'Quadratic cost function:\s*Jb\s*\(\s*(\d+)\)\s*=\s*([\d.e+\-]+)')
     jojc_pattern = re.compile(r'Quadratic cost function:\s*JoJc\(\s*(\d+)\)\s*=\s*([\d.e+\-]+)')
@@ -186,6 +308,28 @@ def parse_cost_convergence(lines):
 
 
 def parse_departures(lines):
+    """Parse observation departures (Min/Max/RMS) from a JEDI log.
+
+    Parameters
+    ----------
+    lines : list of str
+        Log file lines.
+
+    Returns
+    -------
+    OrderedDict
+        Mapping of (obs_type, variable) → statistics:
+        - Nobs : int
+        - Min : float
+        - Max : float
+        - RMS : float
+
+    Notes
+    -----
+    Departures are extracted from lines like:
+
+        Jo Dep : AMSUA:brightness_temperature : Nobs=1234, Min=-1.2, Max=3.4, RMS=0.56
+    """
     dep_pattern = re.compile(
         r'Jo Dep\s*:(\S+(?:\s+\S+)?):(\S+)\s*:\s*Nobs=\s*(\d+),\s*Min=\s*([\d.e+\-]+),\s*Max=\s*([\d.e+\-]+),\s*RMS=\s*([\d.e+\-]+)'
     )
@@ -204,6 +348,31 @@ def parse_departures(lines):
 
 
 def parse_obs_errors(lines):
+    """Parse diagonal observation error statistics.
+
+    Parameters
+    ----------
+    lines : list of str
+        Log file lines.
+
+    Returns
+    -------
+    OrderedDict
+        Mapping of obs_type → statistics:
+        - nobs : int
+        - Min : float
+        - Max : float
+        - RMS : float
+
+    Notes
+    -----
+    Extracts values from the block:
+
+        Diagonal observation error covariance
+            AMSUA nobs=..., Min=..., Max=..., RMS=...
+
+    Parsing stops when the next CostJo block begins.
+    """
     err_pattern = re.compile(
         r'^(\S+(?:\s+\S+)?)\s+nobs=\s*(\d+)\s+Min=([\d.e+\-]+),\s*Max=([\d.e+\-]+),\s*RMS=([\d.e+\-]+)'
     )
@@ -222,11 +391,75 @@ def parse_obs_errors(lines):
                         'Max': float(m.group(4)), 'RMS': float(m.group(5)),
                     }
                     seen.add(obs_type)
-        if 'CostJo' in stripped and 'Nonlinear' in stripped: break
+        if 'CostJo' in stripped and 'Nonlinear' in stripped:
+            break
     return errors
 
-
 def generate_report(config, obs_counts, jo_data, jo_total, convergence, departures, obs_errors):
+    """Generate a comprehensive human‑readable diagnostic report from parsed JEDI log data.
+
+    Parameters
+    ----------
+    config : dict
+        High‑level configuration metadata extracted by ``parse_configuration``.
+        Includes cost type, analysis time, resolutions, weights, ensemble size,
+        minimizer, and inner‑loop structure.
+    obs_counts : OrderedDict
+        Observation counts from ``parse_obs_counts``. For each obs type:
+        - nlocs : loaded locations
+        - nobs_total : total obs before QC
+        - nobs_assimilated : obs used in Jo
+        - nobs_per_var : per‑variable assimilated counts
+    jo_data : OrderedDict
+        Per‑observation‑type Jo evolution from ``parse_jo_evolution``.
+        Each entry is a list of records:
+        - Jo : float
+        - nobs : int
+        - Jo_n : float (Jo/n)
+        - err : float
+    jo_total : list of float
+        Total Jo values across outer loops.
+    convergence : list of list of dict
+        Cost‑function convergence from ``parse_cost_convergence``.
+        Each outer loop is a list of iteration records:
+        - iter : int
+        - J : float
+        - Jb : float
+        - JoJc : float
+    departures : OrderedDict
+        Observation departures from ``parse_departures``.
+        Mapping of (obs_type, variable) → {Nobs, Min, Max, RMS}.
+    obs_errors : OrderedDict
+        Observation error statistics from ``parse_obs_errors``.
+        Mapping of obs_type → {nobs, Min, Max, RMS}.
+
+    Returns
+    -------
+    str
+        A formatted multi‑section diagnostic report summarizing:
+        1. Configuration metadata
+        2. Observation counts and assimilation percentages
+        3. Jo/n evolution across outer loops
+        4. Cost‑function convergence (J, Jb, JoJc)
+        5. Chi‑squared consistency diagnostics
+
+    Notes
+    -----
+    This function produces a *text‑only* report suitable for:
+    - Terminal output
+    - Saving to a text file
+    - Inclusion in automated DA monitoring systems
+
+    The report is structured with clear section headers and aligned columns
+    for readability. It mirrors the structure of operational DA monitoring
+    reports used in NWP centers.
+
+    The chi‑squared section provides a quick assessment of observation
+    error calibration:
+    - Jo/n ≈ 1.0 → well‑calibrated
+    - Jo/n < 0.5 → R too large (overestimated)
+    - Jo/n > 1.5 → R too small (underestimated)
+    """
     out = []
     sep = "=" * 80
 
@@ -324,8 +557,41 @@ def generate_report(config, obs_counts, jo_data, jo_total, convergence, departur
     out.append(sep)
     return "\n".join(out)
 
-
 def main():
+    """Command‑line interface for the JEDI log parser.
+
+    This function:
+
+    1. Parses command‑line arguments
+       - ``logfile`` (required): path to the JEDI log file
+       - ``--output`` / ``-o`` (optional): write report to a file
+
+    2. Reads the log file into memory
+
+    3. Calls all parsing routines:
+       - ``parse_configuration``
+       - ``parse_obs_counts``
+       - ``parse_jo_evolution``
+       - ``parse_cost_convergence``
+       - ``parse_departures``
+       - ``parse_obs_errors``
+
+    4. Generates a full diagnostic report using ``generate_report``
+
+    5. Prints the report to stdout or writes it to a file
+
+    Notes
+    -----
+    This function is intentionally lightweight so that the parsing logic
+    remains testable and reusable. The CLI wrapper simply orchestrates
+    the workflow and handles I/O.
+
+    Example
+    -------
+    Run from the command line:
+
+        python parse_jedi_log.py jedi.log --output report.txt
+    """
     parser = argparse.ArgumentParser(description="JEDI Log Parser")
     parser.add_argument("logfile", help="Path to JEDI log file")
     parser.add_argument("--output", "-o", default=None)
@@ -352,4 +618,10 @@ def main():
 
 
 if __name__ == "__main__":
+    """Execute the JEDI log parser when run as a script.
+
+    This simply forwards execution to ``main()``. The recommended usage is:
+
+        python parse_jedi_log.py jedi.log --output report.txt
+    """
     main()
