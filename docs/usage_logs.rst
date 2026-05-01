@@ -1,53 +1,36 @@
-JEDI Log Tools
-==============
+Using Log Diagnostics
+=====================
 
-This page describes the log‑parsing utilities included in
-``ufs-da-diagnostics``. These tools extract useful information from
-FV3‑JEDI run logs, including iteration summaries, cost‑function
-components, and QC statistics.
+The log diagnostics subsystem parses a full JEDI variational DA log and
+extracts structured diagnostics.
 
+Running the CLI Tool
+--------------------
 
-Basic Usage
------------
+.. code-block:: bash
 
-To parse a JEDI log:
-
-.. code-block:: python
-
-    from ufs_da_diagnostics.logs.log_parser import LogParser
-
-    parser = LogParser("jedi.log")
-    summary = parser.extract_iteration_summary()
-
-    print(summary)
+    ufsda-log-diagnostic config/log_diag.yaml
 
 
-Available Functions
--------------------
+YAML Configuration
+------------------
 
-- ``extract_iteration_summary()``  
-  Returns iteration number, cost function values, and convergence info.
+.. code-block:: yaml
 
-- ``extract_qc_summary()``  
-  Summarizes QC pass/fail counts by observation type.
+    input:
+      log_file: jedi.log
 
-- ``extract_timing()``  
-  Reports wall‑clock timing for major JEDI components.
+    output:
+      directory: log_diagnostics/
+      save_json: true
+      plots: true
 
 
-Example
+Outputs
 -------
 
-.. code-block:: python
-
-    parser = LogParser("jedi.log")
-    qc = parser.extract_qc_summary()
-    print(qc)
-
-
-Notes
------
-
-- The parser is robust to multi‑line log entries.
-- Missing fields are skipped gracefully.
-- Output is returned as Python dictionaries for easy downstream use.
+- ``config.json`` — extracted configuration
+- ``obs_counts.json`` — observation counts
+- ``jo_evolution.png`` — Jo evolution plot
+- ``cost_convergence.png`` — cost function plot
+- ``departures.json`` — departures summary
