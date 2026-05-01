@@ -1,4 +1,28 @@
-# plots/spectra_plots.py
+"""
+Spectral Diagnostics Plotting
+=============================
+
+This module provides the plotting backend for the spectral diagnostics
+subsystem. It generates a **three‑panel spectral diagnostics figure**
+for a given model level:
+
+1. **1D isotropic spectra**  
+   - CTRL spectrum  
+   - EXP spectrum  
+   - Absolute difference  
+
+2. **Vertical variance profile**  
+   - Ratio of EXP/CTRL variance as a function of model level  
+
+3. **2D spectral ratio**  
+   - EXP/CTRL ratio across (level × wavenumber)
+
+The figure layout and styling are consistent with the rest of the
+diagnostics suite through inheritance from ``BasePlotter``.
+
+The module also includes a fixed FV3 pressure grid (``PFULL_MBAR``)
+used to annotate pressure levels in the title.
+"""
 
 import matplotlib.pyplot as plt
 import numpy as np
@@ -22,10 +46,84 @@ PFULL_MBAR = np.array([
 
 
 class SpectraPlotter(BasePlotter):
+    """
+    Plotter for spectral diagnostics (1D spectra, variance profile, 2D ratio).
+
+    This class generates a three‑panel figure summarizing spectral
+    differences between a control experiment and a test experiment.
+
+    Expected ``core`` object interface
+    ----------------------------------
+    The ``core`` argument must be an instance of ``SpectraCore`` and
+    provide:
+
+    - ``core.varname`` : variable name
+    - ``core.k`` : wavenumber array
+    - ``core.spec_ctrl_all[level]`` : 1D CTRL spectrum
+    - ``core.spec_exp_all[level]`` : 1D EXP spectrum
+    - ``core.variance_profile()`` : vertical variance ratio (EXP/CTRL)
+    - ``core.spectral_ratio_2d()`` : 2D ratio (level × wavenumber)
+    - ``core.nlevels`` : number of vertical levels
+
+    Notes
+    -----
+    - Pressure annotations use the fixed FV3 ``PFULL_MBAR`` grid.
+    - ``return_fig=True`` allows the caller to embed the figure in
+      multi‑page PDFs or composite layouts.
+    """
 
     def plot_spectra(self, core, level, ctrl_name, exp_name,
                      fname=None, nicas_length_scale=None, return_fig=False):
+        """
+        Generate a 3‑panel spectral diagnostics figure for a given level.
 
+        Parameters
+        ----------
+        core : SpectraCore
+            Spectral diagnostics engine providing spectra and ratios.
+        level : int
+            Model level index to plot.
+        ctrl_name : str
+            Label for the control experiment.
+        exp_name : str
+            Label for the experiment being compared.
+        fname : str, optional
+            Output filename. If ``None``, the figure is not saved.
+        nicas_length_scale : float, optional
+            NICAS length scale (meters). If provided, displayed in the
+            1D spectra panel.
+        return_fig : bool, optional
+            If ``True``, return the Matplotlib figure instead of saving.
+
+        Returns
+        -------
+        matplotlib.figure.Figure or None
+            Returned only when ``return_fig=True``.
+            Otherwise, the figure is saved (if ``fname`` is provided)
+            and closed.
+
+        Figure Panels
+        -------------
+        **Panel 1 — 1D Spectra**
+            - CTRL spectrum
+            - EXP spectrum
+            - Absolute difference
+            - Optional NICAS length scale annotation
+
+        **Panel 2 — Variance Profile**
+            - EXP/CTRL variance ratio vs model level
+            - Vertical axis inverted (top = surface)
+
+        **Panel 3 — 2D Spectral Ratio**
+            - EXP/CTRL ratio across (level × wavenumber)
+            - Log‑scaled wavenumber axis
+            - Colorbar range fixed to [0.5, 1.5]
+
+        Notes
+        -----
+        - The figure uses a fixed 1×3 layout with equal aspect panels.
+        - Pressure annotation is included in the title when available.
+        """
         fig = plt.figure(figsize=(18, 7.5))
         fig.subplots_adjust(left=0.05, right=0.98, top=0.90,
                             bottom=0.12, wspace=0.30)
