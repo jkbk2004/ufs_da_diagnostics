@@ -49,24 +49,5 @@ Parse a JEDI variational DA log:
 
     ufsda-jedi-log log_diag.yaml
 
-
-Minimal YAML Example
---------------------
-
-.. code-block:: yaml
-
-    experiment:
-      name: EXP
-      increment_file: inc.nc4
-      background_file: bkg.nc4
-
-    output:
-      directory: diagnostics/
-      plots: true
-      save_data: true
-
-    variables:
-      - u
-      - v
       - t
       - ps
