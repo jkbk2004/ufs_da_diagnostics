@@ -28,14 +28,14 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    parse_configuration
-    parse_obs_counts
-    parse_jo_evolution
-    parse_cost_convergence
-    parse_departures
-    parse_obs_errors
-    generate_report
-    main
+    ufs_da_diagnostics.logs.parse_jedi_log.parse_configuration
+    ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_counts
+    ufs_da_diagnostics.logs.parse_jedi_log.parse_jo_evolution
+    ufs_da_diagnostics.logs.parse_jedi_log.parse_cost_convergence
+    ufs_da_diagnostics.logs.parse_jedi_log.parse_departures
+    ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_errors
+    ufs_da_diagnostics.logs.parse_jedi_log.generate_report
+    ufs_da_diagnostics.logs.parse_jedi_log.main
 
 
 Detailed API
@@ -45,46 +45,53 @@ Configuration Parsing
 ~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_configuration
+   :no-index:
 
 
 Observation Counts
 ~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_counts
+   :no-index:
 
 
 Jo Evolution
 ~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_jo_evolution
+   :no-index:
 
 
 Cost‑Function Convergence
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_cost_convergence
+   :no-index:
 
 
 Departures
 ~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_departures
+   :no-index:
 
 
 Observation Error Statistics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_errors
+   :no-index:
 
 
 Report Generation
 ~~~~~~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.generate_report
+   :no-index:
 
 
 CLI Entry Point
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.main
-
+   :no-index:

@@ -40,9 +40,32 @@ Function Summary
    :nosignatures:
 
    ufs_da_diagnostics.spectra.spectra_core.SpectraCore
-   ufs_da_diagnostics.spectra.spectra_core.SpectraCore.compute_spectrum
-   ufs_da_diagnostics.spectra.spectra_core.SpectraCore.compute_vertical_variance
-   ufs_da_diagnostics.spectra.spectra_core.SpectraCore.load_field
-
    ufs_da_diagnostics.spectra.spectra_analysis_tiles.main
    ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main
+
+
+Detailed API
+------------
+
+Core Engine
+~~~~~~~~~~~
+
+.. autoclass:: ufs_da_diagnostics.spectra.spectra_core.SpectraCore
+   :members:
+   :undoc-members:
+   :show-inheritance:
+   :no-index:
+
+
+Analysis Increment Driver
+~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: ufs_da_diagnostics.spectra.spectra_analysis_tiles.main
+   :no-index:
+
+
+Background vs Increment Driver
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+.. autofunction:: ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main
+   :no-index:

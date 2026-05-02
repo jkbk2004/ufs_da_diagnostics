@@ -1,3 +1,5 @@
+.. _diagnostics_overview:
+
 Diagnostics Overview
 ====================
 

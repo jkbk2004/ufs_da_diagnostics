@@ -1,3 +1,5 @@
+.. _usage_observation_tools:
+
 Using Observation Diagnostics
 =============================
 

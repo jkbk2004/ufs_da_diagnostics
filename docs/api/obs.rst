@@ -17,6 +17,7 @@ Module
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 
 Function Summary
@@ -26,8 +27,8 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    parse_args
-    main
+    ufs_da_diagnostics.obs.obs_diagnostic.parse_args
+    ufs_da_diagnostics.obs.obs_diagnostic.main
 
 
 Detailed API
@@ -37,9 +38,11 @@ Argument Parsing
 ~~~~~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.parse_args
+   :no-index:
 
 
 CLI Entry Point
 ~~~~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.main
+   :no-index:
