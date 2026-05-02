@@ -23,7 +23,6 @@ Function Summary
 ----------------
 
 .. autosummary::
-    :toctree: generated/
     :nosignatures:
 
     load_tile

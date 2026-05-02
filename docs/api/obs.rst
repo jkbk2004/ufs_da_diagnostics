@@ -4,8 +4,8 @@ Observation Diagnostics Driver API
 The ``obs_diagnostic`` module provides the command-line interface for
 running observation diagnostics.
 
-Module
-------
+Modules
+-------
 
 .. automodule:: ufs_da_diagnostics.obs.obs_diagnostic
     :members:
@@ -18,7 +18,6 @@ Function Summary
 ----------------
 
 .. autosummary::
-    :toctree: generated/
     :nosignatures:
 
     parse_args
@@ -28,14 +27,8 @@ Function Summary
 Detailed API
 ------------
 
-Argument Parsing
-~~~~~~~~~~~~~~~~
-
 .. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.parse_args
    :no-index:
-
-CLI Entry Point
-~~~~~~~~~~~~~~~
 
 .. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.main
    :no-index:

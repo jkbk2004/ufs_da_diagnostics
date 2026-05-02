@@ -76,6 +76,7 @@ Background vs Increment Spectra
 .. figure:: _static/images/spectra/bkg_T_inc_L75.png
    :width: 90%
    :align: center
+   :class: left-caption
 
    Background and increment spectra for temperature at model level 75.
    The increment spectrum shows how analysis updates redistribute
@@ -96,6 +97,7 @@ enhanced low‑wavenumber variance and reduced high‑wavenumber variance.
 .. figure:: _static/images/spectra/T_inc_ctrl_vs_length-scale_spectra_L75.png
    :width: 90%
    :align: center
+   :class: left-caption
 
    Comparison of CTRL and NICAS length‑scale experiments for temperature
    increments at level 75. The NICAS experiment uses a larger horizontal
@@ -191,6 +193,7 @@ Extended ATMS Statistics
 .. figure:: _static/images/obs/atms_stats_extended.png
    :width: 90%
    :align: center
+   :class: left-caption
 
    Extended ATMS observation‑space diagnostics showing O–B and O–A bias,
    RMS, normalized RMS, bias‑corrected RMS, and analysis improvement

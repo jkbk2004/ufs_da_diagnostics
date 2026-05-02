@@ -2,13 +2,7 @@ Plotting Subsystem API
 ======================
 
 The plotting subsystem provides all figure-generation utilities used by
-the diagnostics drivers. This includes ATMS observation plots, scalar
-and vector histograms, QC summaries, spectra visualizations, and shared
-plotting utilities.
-
-This page documents the full plotting engine under
-``ufs_da_diagnostics.plots``.
-
+the diagnostics drivers.
 
 Modules
 -------
@@ -89,7 +83,6 @@ Function Summary
 ----------------
 
 .. autosummary::
-    :toctree: generated/
     :nosignatures:
 
     to_numeric_safe
