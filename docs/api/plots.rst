@@ -92,7 +92,7 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    ufs_da_diagnostics.plots.utils_loaders.to_numeric_safe
-    ufs_da_diagnostics.plots.utils_loaders.load_qc_universal
-    ufs_da_diagnostics.plots.utils_loaders.load_obsvalue
-    ufs_da_diagnostics.plots.utils_loaders.load_hofx
+    to_numeric_safe
+    load_qc_universal
+    load_obsvalue
+    load_hofx

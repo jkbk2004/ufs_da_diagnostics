@@ -1,17 +1,15 @@
 """
 Scalar Observation Histograms
-=============================
 
-This module provides histogram diagnostics for **scalar observation
-types** (e.g., temperature, humidity, pressure). It supports two modes:
+This module provides histogram diagnostics for scalar observation types
+(e.g., temperature, humidity, pressure). It supports two modes:
 
-1. **Standard scalar diagnostics**  
-   - OMB histogram (QC2==0)
+1. Standard scalar diagnostics
+   - OMB histogram (QC2 == 0)
    - Optional OMA overlay (if available)
 
-2. **GNSSRO fallback mode**  
-   - If OMB is missing (common for GNSSRO), the histogram is generated
-     from ``ObsValue`` only.
+2. GNSSRO fallback mode
+   - If OMB is missing, the histogram is generated from ObsValue only.
 
 QC2 filtering is applied consistently, and all arrays are flattened
 before histogramming.

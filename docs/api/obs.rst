@@ -2,13 +2,7 @@ Observation Diagnostics Driver API
 ==================================
 
 The ``obs_diagnostic`` module provides the command-line interface for
-running observation diagnostics. It loads a YAML configuration file and
-dispatches all requested diagnostics through the
-``ObsDiagPlotter`` orchestrator in ``ufs_da_diagnostics.plots``.
-
-This module does not implement diagnostics directly; it only provides
-the CLI wrapper.
-
+running observation diagnostics.
 
 Module
 ------
@@ -27,8 +21,8 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    ufs_da_diagnostics.obs.obs_diagnostic.parse_args
-    ufs_da_diagnostics.obs.obs_diagnostic.main
+    parse_args
+    main
 
 
 Detailed API
@@ -39,7 +33,6 @@ Argument Parsing
 
 .. autofunction:: ufs_da_diagnostics.obs.obs_diagnostic.parse_args
    :no-index:
-
 
 CLI Entry Point
 ~~~~~~~~~~~~~~~

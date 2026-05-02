@@ -1,20 +1,18 @@
-JEDI Log Diagnostics API
-========================
+Increment Diagnostics API
+=========================
 
-The log diagnostics subsystem provides tools for parsing a full JEDI
-variational DA log file and extracting structured diagnostic
-information. This includes configuration metadata, observation counts,
-Jo evolution, cost‑function convergence, departures, and observation
-error statistics.
+The increment diagnostics subsystem provides tools for loading FV3-JEDI
+increment tiles, constructing global stitched fields, and computing
+zonal-mean cross sections.
 
-This page documents the full log‑parsing engine under
-``ufs_da_diagnostics.logs``.
+This page documents the functions available in
+``ufs_da_diagnostics.increment.increment_maps_tiles``.
 
 
 Modules
 -------
 
-.. automodule:: ufs_da_diagnostics.logs.parse_jedi_log
+.. automodule:: ufs_da_diagnostics.increment.increment_maps_tiles
     :members:
     :undoc-members:
     :show-inheritance:
@@ -28,70 +26,36 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_configuration
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_counts
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_jo_evolution
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_cost_convergence
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_departures
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_errors
-    ufs_da_diagnostics.logs.parse_jedi_log.generate_report
-    ufs_da_diagnostics.logs.parse_jedi_log.main
+    load_tile
+    load_grid
+    load_pressure
+    build_global
+    compute_zonal_mean_full
 
 
 Detailed API
 ------------
 
-Configuration Parsing
-~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_configuration
-   :no-index:
-
-
-Observation Counts
-~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_counts
-   :no-index:
-
-
-Jo Evolution
+Tile Loading
 ~~~~~~~~~~~~
 
-.. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_jo_evolution
+.. autofunction:: ufs_da_diagnostics.increment.increment_maps_tiles.load_tile
    :no-index:
 
+.. autofunction:: ufs_da_diagnostics.increment.increment_maps_tiles.load_grid
+   :no-index:
 
-Cost‑Function Convergence
+.. autofunction:: ufs_da_diagnostics.increment.increment_maps_tiles.load_pressure
+   :no-index:
+
+Global Field Construction
 ~~~~~~~~~~~~~~~~~~~~~~~~~
 
-.. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_cost_convergence
+.. autofunction:: ufs_da_diagnostics.increment.increment_maps_tiles.build_global
    :no-index:
 
+Zonal Mean Diagnostics
+~~~~~~~~~~~~~~~~~~~~~~
 
-Departures
-~~~~~~~~~~
-
-.. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_departures
-   :no-index:
-
-
-Observation Error Statistics
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-.. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_errors
-   :no-index:
-
-
-Report Generation
-~~~~~~~~~~~~~~~~~
-
-.. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.generate_report
-   :no-index:
-
-
-CLI Entry Point
-~~~~~~~~~~~~~~~
-
-.. autofunction:: ufs_da_diagnostics.logs.parse_jedi_log.main
+.. autofunction:: ufs_da_diagnostics.increment.increment_maps_tiles.compute_zonal_mean_full
    :no-index:

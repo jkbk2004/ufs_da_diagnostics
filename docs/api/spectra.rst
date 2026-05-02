@@ -39,9 +39,8 @@ Function Summary
    :toctree: generated/
    :nosignatures:
 
-   ufs_da_diagnostics.spectra.spectra_core.SpectraCore
-   ufs_da_diagnostics.spectra.spectra_analysis_tiles.main
-   ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main
+   SpectraCore
+   main
 
 
 Detailed API
