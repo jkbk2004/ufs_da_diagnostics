@@ -206,26 +206,30 @@ def parse_jo_evolution(lines):
 
     Returns
     -------
-    jo_data : OrderedDict
-        Mapping of obs_type → list of records, each containing:
-        - Jo : float
-        - nobs : int
-        - Jo_n : float (Jo/n)
-        - err : float
-    jo_total : list of float
-        Total Jo values across outer loops (not per‑obs‑type).
+    tuple
+        A tuple ``(jo_data, jo_total)`` where:
+
+        * ``jo_data`` (OrderedDict): Mapping of ``obs_type`` to a list of
+          records. Each record contains:
+
+          - ``Jo`` (float): Raw Jo value.
+          - ``nobs`` (int): Number of observations.
+          - ``Jo_n`` (float): Jo/n value.
+          - ``err`` (float): Reported error term.
+
+        * ``jo_total`` (list of float): Total Jo values across outer loops.
 
     Notes
     -----
     This function extracts two types of information:
 
-    1. **Per‑observation‑type Jo evolution**
-       From lines like:
-           ``CostJo : Nonlinear Jo(AMSUA) = 1234, nobs = 567, Jo/n = 2.17, err = ...``
+    1. **Per‑observation‑type Jo evolution**, from lines like::
 
-    2. **Total Jo evolution**
-       From lines like:
-           ``CostJo : Nonlinear Jo = 34567``
+           CostJo : Nonlinear Jo(AMSUA) = 1234, nobs = 567, Jo/n = 2.17, err = ...
+
+    2. **Total Jo evolution**, from lines like::
+
+           CostJo : Nonlinear Jo = 34567
 
     The parser is robust to ordering differences across JEDI versions.
     """

@@ -19,28 +19,30 @@ Modules
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 .. automodule:: ufs_da_diagnostics.spectra.spectra_analysis_tiles
     :members:
     :undoc-members:
+    :noindex:
 
 .. automodule:: ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc
     :members:
     :undoc-members:
+    :noindex:
 
 
 Function Summary
 ----------------
 
 .. autosummary::
-    :toctree: generated/
-    :nosignatures:
+   :toctree: generated/
+   :nosignatures:
 
-    ufs_da_diagnostics.spectra.spectra_core.SpectraCore
-    ufs_da_diagnostics.spectra.spectra_core.SpectraCore.compute_spectrum
-    ufs_da_diagnostics.spectra.spectra_core.SpectraCore.compute_vertical_variance
-    ufs_da_diagnostics.spectra.spectra_core.SpectraCore.load_field
+   ufs_da_diagnostics.spectra.spectra_core.SpectraCore
+   ufs_da_diagnostics.spectra.spectra_core.SpectraCore.compute_spectrum
+   ufs_da_diagnostics.spectra.spectra_core.SpectraCore.compute_vertical_variance
+   ufs_da_diagnostics.spectra.spectra_core.SpectraCore.load_field
 
-    ufs_da_diagnostics.spectra.spectra_analysis_tiles.main
-
-    ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main
+   ufs_da_diagnostics.spectra.spectra_analysis_tiles.main
+   ufs_da_diagnostics.spectra.spectra_analysis_bkg_inc.main

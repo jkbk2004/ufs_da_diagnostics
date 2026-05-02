@@ -35,13 +35,16 @@ def plot_scalar_hist(f, varname, label, outdir):
 
     This function supports two workflows:
 
-    **1. GNSSRO fallback mode**  
-       If OMB is missing, the function plots a histogram of ``ObsValue``
-       only. This matches the behavior of legacy GNSSRO diagnostics.
+    1. **GNSSRO fallback mode**
 
-    **2. Standard scalar mode**  
+       If OMB is missing, the function plots a histogram of ``ObsValue`` only.
+       This matches the behavior of legacy GNSSRO diagnostics.
+
+    2. **Standard scalar mode**
+
        If OMB exists, the function plots:
-       - OMB histogram (QC2==0)
+
+       - OMB histogram (QC2 == 0)
        - Optional OMA overlay (if available)
 
     Parameters

@@ -26,8 +26,8 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    ufs_da_diagnostics.obs.obs_diagnostic.parse_args
-    ufs_da_diagnostics.obs.obs_diagnostic.main
+    parse_args
+    main
 
 
 Detailed API

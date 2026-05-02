@@ -16,6 +16,7 @@ Modules
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:      
 
 
 Function Summary
@@ -25,11 +26,11 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    ufs_da_diagnostics.increment.increment_maps_tiles.load_tile
-    ufs_da_diagnostics.increment.increment_maps_tiles.load_grid
-    ufs_da_diagnostics.increment.increment_maps_tiles.load_pressure
-    ufs_da_diagnostics.increment.increment_maps_tiles.build_global
-    ufs_da_diagnostics.increment.increment_maps_tiles.compute_zonal_mean_full
+    load_tile
+    load_grid
+    load_pressure
+    build_global
+    compute_zonal_mean_full
 
 
 Detailed API

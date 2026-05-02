@@ -21,26 +21,27 @@ Architecture
 The diagnostics package is structured as a set of modular subsystems,
 each with its own API, CLI entry points, and plotting utilities.
 
-```mermaid
-flowchart TD
+.. mermaid::
 
-    A[CLI Drivers] --> B[Spectra Subsystem]
-    A --> C[Increment Subsystem]
-    A --> D[Observation Subsystem]
-    A --> E[Log Subsystem]
+   flowchart TD
 
-    B --> B1[SpectraCore]
-    B --> B2[Spectra Analysis Drivers]
-    B --> B3[Spectra Plotting]
+       A[CLI Drivers] --> B[Spectra Subsystem]
+       A --> C[Increment Subsystem]
+       A --> D[Observation Subsystem]
+       A --> E[Log Subsystem]
 
-    C --> C1[IncrementMaps]
-    C --> C2[Tile Maps / Global Maps]
-    C --> C3[Zonal Means]
+       B --> B1[SpectraCore]
+       B --> B2[Spectra Analysis Drivers]
+       B --> B3[Spectra Plotting]
 
-    D --> D1[ObsDiagnostic]
-    D --> D2[IODA Loaders]
-    D --> D3[Obs Plotting]
+       C --> C1[IncrementMaps]
+       C --> C2[Tile Maps / Global Maps]
+       C --> C3[Zonal Means]
 
-    E --> E1[Log Parser]
-    E --> E2[Cost Function Diagnostics]
-    E --> E3[Jo / Departures / Obs Errors]
+       D --> D1[ObsDiagnostic]
+       D --> D2[IODA Loaders]
+       D --> D3[Obs Plotting]
+
+       E --> E1[Log Parser]
+       E --> E2[Cost Function Diagnostics]
+       E --> E3[Jo / Departures / Obs Errors]

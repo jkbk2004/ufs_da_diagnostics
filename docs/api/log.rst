@@ -18,6 +18,7 @@ Modules
     :members:
     :undoc-members:
     :show-inheritance:
+    :noindex:
 
 
 Function Summary
@@ -27,14 +28,14 @@ Function Summary
     :toctree: generated/
     :nosignatures:
 
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_configuration
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_counts
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_jo_evolution
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_cost_convergence
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_departures
-    ufs_da_diagnostics.logs.parse_jedi_log.parse_obs_errors
-    ufs_da_diagnostics.logs.parse_jedi_log.generate_report
-    ufs_da_diagnostics.logs.parse_jedi_log.main
+    parse_configuration
+    parse_obs_counts
+    parse_jo_evolution
+    parse_cost_convergence
+    parse_departures
+    parse_obs_errors
+    generate_report
+    main
 
 
 Detailed API
