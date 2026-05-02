@@ -21,7 +21,7 @@ statistics—the toolkit includes two advanced diagnostic components:
    statistics provide a detailed view of observation‑space performance
    beyond simple mean and RMS values.
 
-In addition, the toolkit supports a **chi‑squared consistency check**
+In addition, the toolkit supports a **chi‑square consistency check**
 through automated parsing of JEDI log files. This diagnostic evaluates
 whether the ratio :math:`\mathrm{Jo}/p` approaches unity, indicating
 consistency between observation errors, background errors, and the
@@ -201,3 +201,54 @@ Extended ATMS Statistics
    random error, and the degree to which the analysis reduces
    observation‑space departures.
 
+
+Chi‑Square Consistency Check
+============================
+
+The chi‑square consistency diagnostic evaluates whether the innovations
+(OMB) are statistically compatible with the assumed observation‑error
+covariance. This test is widely used in data assimilation to assess
+whether the specified observation errors are under‑ or over‑estimated.
+
+For scalar observations with departures :math:`d_{b,i}` and
+observation‑error variances :math:`\sigma_{o,i}^2`, the chi‑square
+statistic is
+
+.. math::
+
+   \chi^2 = \frac{1}{N} \sum_{i=1}^{N}
+            \frac{d_{b,i}^2}{\sigma_{o,i}^2}.
+
+**Interpretation:**
+
+- :math:`\chi^2 \approx 1`  
+  → observation errors are consistent with the actual innovation
+  statistics.
+
+- :math:`\chi^2 \gg 1`  
+  → observation errors are underestimated (innovations too large).
+
+- :math:`\chi^2 \ll 1`  
+  → observation errors are overestimated (innovations too small).
+
+In practice, the toolkit computes this diagnostic by parsing the JEDI
+log file and extracting the reported values of :math:`\mathrm{Jo}` and
+the number of assimilated observations :math:`p`, using the relation
+
+.. math::
+
+   \chi^2 \approx \frac{\mathrm{Jo}}{p}.
+
+A value near unity indicates that the observation‑error model is
+statistically consistent with the innovations.
+
+Reference
+---------
+
+The chi‑square consistency principle is discussed in:
+
+- Talagrand, O. (2003). *Evaluation of probabilistic prediction systems*.
+  In: **Workshop on Diagnostics for Data Assimilation Systems**, ECMWF.
+
+This reference provides the theoretical basis for interpreting
+:math:`\mathrm{Jo}/p` as a measure of observation‑error consistency.
