@@ -47,7 +47,4 @@ Parse a JEDI variational DA log:
 
 .. code-block:: bash
 
-    ufsda-jedi-log log_diag.yaml
-
-      - t
-      - ps
+    ufsda-jedi-log path/to/OUTPUT.fv3jedi --output report.txt
