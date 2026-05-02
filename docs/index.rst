@@ -11,6 +11,7 @@ Contents
 
     installation
     quickstart
+    diagnostics_overview
 
     usage_spectra
     usage_increment
