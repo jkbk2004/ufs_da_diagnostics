@@ -1,4 +1,3 @@
-
 import os
 import numpy as np
 import matplotlib.pyplot as plt
@@ -120,7 +119,8 @@ class ObsDiagPlotter:
             otype = obs_cfg["type"]
             var = obs_cfg["variable"]
             diag = obs_cfg.get("diag", obs_cfg.get("file"))
-            outdir = obs_cfg.get("outdir", "./plot-outputs-obs")
+            global_outdir = self.config.get("outdir", "./plot-outputs-obs")
+            outdir = obs_cfg.get("outdir", global_outdir)
             diags_cfg = obs_cfg.get("diagnostics", {})
 
             print(f"[INFO] Processing {label} ({otype}) from {diag}")
