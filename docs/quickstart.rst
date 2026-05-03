@@ -27,7 +27,7 @@ Generate tile maps, global maps, and zonal means:
 
 .. code-block:: bash
 
-    ufsda-increment-maps --yaml increment_maps.yaml
+    ufsda-inc-maps --yaml increment_maps.yaml
 
 
 Observation Diagnostics
