@@ -11,13 +11,13 @@ Compute spectra comparing analysis increments between CTRL and EXP:
 
 .. code-block:: bash
 
-    ufsda-spectra-ana-inc spectra_ana_inc.yaml
+    ufsda-spectra-ana-inc --yaml spectra_ana_inc.yaml
 
 Compute spectra comparing background vs increment:
 
 .. code-block:: bash
 
-    ufsda-spectra-bkg-inc spectra_bkg_inc.yaml
+    ufsda-spectra-bkg-inc --yaml spectra_bkg_inc.yaml
 
 
 Increment Maps
@@ -27,7 +27,7 @@ Generate tile maps, global maps, and zonal means:
 
 .. code-block:: bash
 
-    ufsda-increment-maps increment_maps.yaml
+    ufsda-increment-maps --yaml increment_maps.yaml
 
 
 Observation Diagnostics
@@ -37,7 +37,7 @@ Run observation diagnostics on an IODA file:
 
 .. code-block:: bash
 
-    ufsda-obs-diag obs_diag.yaml
+    ufsda-obs-diag --yaml obs_diag.yaml
 
 
 Log Diagnostics
