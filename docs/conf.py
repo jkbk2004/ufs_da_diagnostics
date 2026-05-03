@@ -61,3 +61,13 @@ def setup(app):
     - This avoids the builder-inited crash and the concatenation bug.
     """
     pass
+
+latex_elements = {
+    'tableofcontents': r'''
+        \pagenumbering{roman}
+        \tableofcontents
+        \clearpage
+        \pagenumbering{arabic}
+    ''',
+}
+
