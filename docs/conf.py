@@ -10,7 +10,7 @@ sys.path.insert(0, os.path.abspath('../ufs_da_diagnostics'))
 # Project information
 # ---------------------------------------------------------------------------
 project = "UFS-DA Diagnostics"
-author = "Jonggyun Kim"
+author = "Jong Kim"
 release = "0.1.0"
 
 # ---------------------------------------------------------------------------
