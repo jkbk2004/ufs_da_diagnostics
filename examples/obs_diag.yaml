@@ -1,0 +1,17 @@
+outdir: "/home/jongkim/exp/diag-obs"
+
+observations:
+
+  # ------------------------------------------------------------
+  # ATMS Radiances
+  # ------------------------------------------------------------
+  - label: ATMS
+    type: atms
+    variable: brightnessTemperature
+    diag: "/home/jongkim/exp/diag.atms_n20_2024022400.nc"
+    diagnostics:
+      hist: true
+      stats: true
+      extended: true
+      scanpos: true
+      latbins: true
