@@ -1,34 +1,18 @@
 """
-Extended ATMS Channel‑Wise OMB/OMA Statistics
-=============================================
+Extended ATMS OMB/OMA diagnostics.
 
-This module computes an extended set of per‑channel OMB/OMA diagnostics
-for ATMS radiance observations using QC2 filtering. It expands upon the
-basic ATMS statistics by including:
+This module computes and visualizes channel-by-channel statistics for ATMS
+brightness temperature departures, including:
 
 - Mean OMB / OMA
-- Standard deviation OMB / OMA
 - RMS OMB / OMA
-- RMS difference (OMA – OMB)
-- Normalized RMS (NRMS)
-- Bias‑corrected RMS (BC‑RMS)
+- Bias-corrected RMS (BC-RMS)
+- Normalized RMS (RMS_n), using EffectiveError2 as σ_o
+- RMS_n^2 debug output for chi-square consistency checks
 
-The output is a **4‑panel diagnostic figure**:
-
-1. Mean & Std (dual y‑axes)
-2. RMS
-3. RMS Difference
-4. Normalized RMS & Bias‑Corrected RMS
-
-Channel groups (Window, O₂, H₂O) are shaded for interpretability.
-
-Output
-------
-A single PNG file:
-
-    <label>_stats_extended.png
-
-saved in the specified output directory.
+All computations use QC2==0 and EffectiveError2, matching the values used
+in the JEDI cost function. RMS_n^2 is mathematically equivalent to Jo/p
+for the same QC mask and σ_o.
 """
 
 import os
@@ -43,23 +27,6 @@ from .utils_loaders import load_omb, load_oma_explicit, load_qc_universal
 # Correct ATMS channel groups
 # ---------------------------------------------------------------------
 def channel_groups():
-    """
-    Return ATMS channel group definitions for shading and legends.
-
-    Returns
-    -------
-    list of tuples
-        Each tuple contains:
-        (group_name, start_channel, end_channel, color)
-
-    Notes
-    -----
-    ATMS channel grouping:
-
-    - Window: channels 1–2 and 16–17
-    - O₂ Temperature: channels 3–15
-    - H₂O: channels 18–22
-    """
     return [
         ("Window", 1, 2, "lightgrey"),
         ("O₂ Temp", 3, 15, "lightblue"),
@@ -73,52 +40,55 @@ def channel_groups():
 # ---------------------------------------------------------------------
 def plot_stats_atms_extended(f, varname, label, outdir):
     """
-    Plot extended ATMS per‑channel OMB/OMA diagnostics (QC2‑filtered).
-
-    This function computes and visualizes an extended suite of
-    per‑channel statistics:
-
-    - Mean OMB / OMA
-    - Std  OMB / OMA
-    - RMS  OMB / OMA
-    - RMS difference (OMA – OMB)
-    - Normalized RMS (NRMS = RMS / Std)
-    - Bias‑corrected RMS (BC‑RMS = Std)
+    Generate extended ATMS OMB/OMA diagnostics.
 
     Parameters
     ----------
-    f : xarray.Dataset or dict-like
-        Observation diagnostics file containing OMB, OMA, QC, and metadata.
+    f : netCDF4.Dataset
+        Open IODA diagnostic file containing ATMS groups.
     varname : str
-        Variable name for ATMS radiances (e.g., ``"brightness_temperature"``).
+        Name of the variable (e.g., "brightnessTemperature").
     label : str
-        Short label used in plot titles and output filenames.
+        Label used in figure title and output filename.
     outdir : str
-        Directory where the output PNG file will be saved.
+        Directory where the output PNG will be saved.
 
     Notes
     -----
-    - QC mask is applied per (Location, Channel).
-    - If QC is 1‑D, it is broadcast to match the number of channels.
-    - Channels are assumed to be 1‑indexed for plotting.
-    - One PNG file is produced containing all four panels.
+    - QC mask uses EffectiveQC2 (QC2 == 0).
+    - Observation error σ_o is taken from EffectiveError2, falling back
+      to EffectiveError1 or EffectiveError0 if needed.
+    - Normalized RMS is computed as:
 
-    Returns
-    -------
-    None
-        A single PNG file is written to ``outdir``.
+          RMS_n = sqrt(mean((OMB / σ_o)^2))
+
+      which is dimensionless and equals sqrt(Jo/p).
+
+    - BC-RMS is the sample standard deviation of OMB/OMA:
+
+          BC-RMS = std(OMB)
     """
+
     os.makedirs(outdir, exist_ok=True)
 
     omb = load_omb(f, varname)
     oma = load_oma_explicit(f, varname)
     qc = load_qc_universal(f, varname)
 
+    # Load correct observation error (σ_o)
+    if "EffectiveError2" in f.groups:
+        Rstd = f["EffectiveError2/brightnessTemperature"][:]
+    elif "EffectiveError1" in f.groups:
+        Rstd = f["EffectiveError1/brightnessTemperature"][:]
+    else:
+        Rstd = f["EffectiveError0/brightnessTemperature"][:]
+
+    Rstd = np.asarray(Rstd)
+
     if omb is None or oma is None:
         print(f"[SKIP] {label} ATMS extended stats: missing OMB/OMA")
         return
 
-    # Broadcast QC if needed
     if qc.ndim == 1:
         qc = np.repeat(qc[:, None], omb.shape[1], axis=1)
 
@@ -142,29 +112,63 @@ def plot_stats_atms_extended(f, varname, label, outdir):
     # Compute stats per channel
     # -----------------------------------------------------------------
     for ch in range(nchan):
-        mask = (qc[:, ch] == 0) & np.isfinite(omb[:, ch]) & np.isfinite(oma[:, ch])
+        mask = (
+            (qc[:, ch] == 0)
+            & np.isfinite(omb[:, ch])
+            & np.isfinite(oma[:, ch])
+            & np.isfinite(Rstd[:, ch])
+            & (Rstd[:, ch] > 0)
+        )
+
         if not np.any(mask):
             continue
 
         o = omb[mask, ch].astype("float64")
         a = oma[mask, ch].astype("float64")
+        sigma = Rstd[mask, ch].astype("float64")
 
+        # Means
         mean_omb[ch] = np.mean(o)
         mean_oma[ch] = np.mean(a)
 
+        # ---------------------------------------------------------
+        # BC-RMS (Bias-Corrected RMS)
+        # ---------------------------------------------------------
+        # BC-RMS is the sample standard deviation of the departures
+        # after removing the mean bias:
+        #
+        #   BC-RMS = sqrt( 1/(N-1) * Σ (d_i - mean(d))^2 )
+        #
+        # It is expressed in Kelvin and does NOT use σ_o.
         std_omb[ch] = np.nanstd(o, ddof=1)
         std_oma[ch] = np.nanstd(a, ddof=1)
 
+        bc_rms_omb[ch] = std_omb[ch]
+        bc_rms_oma[ch] = std_oma[ch]
+
+        # RMS
         rms_omb[ch] = np.sqrt(np.mean(o**2))
         rms_oma[ch] = np.sqrt(np.mean(a**2))
 
         rms_diff[ch] = rms_oma[ch] - rms_omb[ch]
 
-        nrms_omb[ch] = rms_omb[ch] / std_omb[ch] if std_omb[ch] > 0 else np.nan
-        nrms_oma[ch] = rms_oma[ch] / std_oma[ch] if std_oma[ch] > 0 else np.nan
+        # ---------------------------------------------------------
+        # Normalized RMS (RMS_n)
+        # ---------------------------------------------------------
+        # RMS_n measures the size of the departures relative to the
+        # assigned observation error σ_o (EffectiveError2):
+        #
+        #   RMS_n = sqrt( mean( (OMB / σ_o)^2 ) )
+        #
+        # RMS_n is dimensionless. RMS_n^2 equals Jo/p.
+        nrms_omb[ch] = np.sqrt(np.mean((o / sigma) ** 2))
+        nrms_oma[ch] = np.sqrt(np.mean((a / sigma) ** 2))
 
-        bc_rms_omb[ch] = std_omb[ch]
-        bc_rms_oma[ch] = std_oma[ch]
+        # ---------------------------------------------------------
+        # Debug print: RMS_n^2 (equals Jo/p)
+        # ---------------------------------------------------------
+        rmsn2 = nrms_omb[ch] ** 2
+        print(f"[DEBUG] Ch {ch+1:02d}  RMS_n^2 = {rmsn2:.4f}")
 
     # -----------------------------------------------------------------
     # Plotting
@@ -180,7 +184,7 @@ def plot_stats_atms_extended(f, varname, label, outdir):
     def shade(ax):
         for name, c1, c2, color in channel_groups():
             ax.axvspan(c1 - 0.5, c2 + 0.5, color=color, alpha=0.25, zorder=0)
-    
+
     # -------------------------
     # Panel 1: Mean & Std
     # -------------------------
@@ -194,23 +198,16 @@ def plot_stats_atms_extended(f, varname, label, outdir):
     ax_std.plot(chans, std_omb, "s--", color="orange", label="Std OMB")
     ax_std.plot(chans, std_oma, "s--", color="purple", label="Std OMA")
     ax_std.set_ylabel("Std")
-    
+
     ax_meanstd.set_title("Mean & Std (OMB / OMA)")
     ax_meanstd.set_xlabel("Channel")
-    
-    # Combined legend
+
     lines1, labels1 = ax_meanstd.get_legend_handles_labels()
     lines2, labels2 = ax_std.get_legend_handles_labels()
-    leg1 = ax_meanstd.legend(
-        lines1 + lines2,
-        labels1 + labels2,
-        loc="lower left",
-        fontsize=8,
-        frameon=True
-    )
+    leg1 = ax_meanstd.legend(lines1 + lines2, labels1 + labels2,
+                             loc="lower left", fontsize=8, frameon=True)
     ax_meanstd.add_artist(leg1)
 
-    # Channel-group legend
     ax_meanstd.legend(
         handles=[
             Patch(facecolor="lightgrey", label="Window (1–2, 16–17)"),
@@ -221,7 +218,7 @@ def plot_stats_atms_extended(f, varname, label, outdir):
         fontsize=6,
         frameon=True
     )
-   
+
     # -------------------------
     # Panel 2: RMS
     # -------------------------
@@ -237,19 +234,21 @@ def plot_stats_atms_extended(f, varname, label, outdir):
     # Panel 3: RMS Difference
     # -------------------------
     shade(ax_rmsdiff)
-    ax_rmsdiff.plot(chans, rms_diff, "o-", color="green", label="RMS(OMA) – RMS(OMB)")
+    ax_rmsdiff.plot(chans, rms_diff, "o-", color="green",
+                    label="RMS(OMA) – RMS(OMB)")
     ax_rmsdiff.set_title("RMS Difference (OMA – OMB)")
     ax_rmsdiff.set_xlabel("Channel")
     ax_rmsdiff.set_ylabel("Difference")
     ax_rmsdiff.legend(loc="lower left", fontsize=8)
-    
+
     # -------------------------
-    # Panel 4: Normalized + BC RMS
+    # Panel 4: Normalized RMS + BC-RMS
     # -------------------------
     shade(ax_norm)
 
     ax_norm.plot(chans, nrms_omb, "^-", color="black", label="NRMS OMB")
     ax_norm.plot(chans, nrms_oma, "^-", color="magenta", label="NRMS OMA")
+
     ax_norm.plot(chans, bc_rms_omb, "s--", color="orange", label="BC-RMS OMB")
     ax_norm.plot(chans, bc_rms_oma, "s--", color="purple", label="BC-RMS OMA")
 
@@ -257,11 +256,7 @@ def plot_stats_atms_extended(f, varname, label, outdir):
     ax_norm.set_xlabel("Channel")
     ax_norm.set_ylabel("RMS")
 
-    # Unified y-axis scaling
-    all_vals = np.concatenate([
-        nrms_omb, nrms_oma,
-        bc_rms_omb, bc_rms_oma
-    ])
+    all_vals = np.concatenate([nrms_omb, nrms_oma, bc_rms_omb, bc_rms_oma])
     all_vals = all_vals[np.isfinite(all_vals)]
     ymin, ymax = np.min(all_vals), np.max(all_vals)
     yr = ymax - ymin
