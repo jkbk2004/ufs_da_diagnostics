@@ -3,6 +3,17 @@
 Diagnostics Overview
 ====================
 
+This diagnostics package is part of the CADRE EPIC FV3-JEDI training
+workflow and is used in the 2026 CADRE Data Assimilation Workshop
+(https://epic.noaa.gov/cadre-epic-data-assimilation-training/). The
+tools support the hands-on sessions for the FV3-JEDI hybrid 3D-Var
+canned case (C96/C48), providing participants with a unified framework
+for analyzing background fields, increments, observation departures,
+spectral characteristics, and chi-square consistency. The same
+diagnostics are used throughout the CADRE Year-2 experiments, including
+the ATMS, GNSSRO, ASCAT, and surface pressure components of the
+FV3-JEDI system.
+
 The diagnostics toolkit provides a unified set of tools for analyzing
 background fields, increments, observation departures, and spectral
 properties of the data assimilation system. In addition to the standard
