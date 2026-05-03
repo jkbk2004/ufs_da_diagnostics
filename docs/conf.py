@@ -71,3 +71,9 @@ latex_elements = {
     ''',
 }
 
+latex_engine = 'xelatex'
+
+latex_elements = {
+    'inputenc': '',
+    'fontenc': '',
+}
