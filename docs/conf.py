@@ -77,3 +77,13 @@ latex_elements = {
     'inputenc': '',
     'fontenc': '',
 }
+
+latex_elements = {
+    'fontpkg': r'''
+\setmainfont{TeX Gyre Pagella}
+\setsansfont{TeX Gyre Heros}
+\setmonofont{TeX Gyre Cursor}
+''',
+}
+
+
