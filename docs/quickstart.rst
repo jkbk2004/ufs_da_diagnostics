@@ -55,6 +55,8 @@ Running on Hercules
 
 The diagnostics toolkit is installed on the Hercules system at:
 
+.. code-block:: bash
+
     /work/noaa/epic/jongkim/ufs_da_diagnostics
 
 To use the preconfigured environment, source the Hercules Anaconda setup:
