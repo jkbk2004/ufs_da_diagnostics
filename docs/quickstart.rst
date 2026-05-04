@@ -65,6 +65,12 @@ To use the preconfigured environment, source the Hercules Anaconda setup:
 
     source /work/noaa/epic/jongkim/hercules.anaconda
 
+For headless plotting on Hercules (no X11 display), set the Matplotlib backend:
+
+.. code-block:: bash
+
+    export MPLBACKEND=Agg
+
 After sourcing the environment, all CLI tools (ufsda-spectra-ana-inc,
 ufsda-spectra-bkg-inc, ufsda-inc-maps, ufsda-obs-diag, ufsda-jedi-log)
 are available in the PATH and can be run directly from any directory.
