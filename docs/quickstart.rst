@@ -48,3 +48,21 @@ Parse a JEDI variational DA log:
 .. code-block:: bash
 
     ufsda-jedi-log path/to/OUTPUT.fv3jedi --output report.txt
+
+
+Running on Hercules
+-------------------
+
+The diagnostics toolkit is installed on the Hercules system at:
+
+    /work/noaa/epic/jongkim/ufs_da_diagnostics
+
+To use the preconfigured environment, source the Hercules Anaconda setup:
+
+.. code-block:: bash
+
+    source /work/noaa/epic/jongkim/hercules.anaconda
+
+After sourcing the environment, all CLI tools (ufsda-spectra-ana-inc,
+ufsda-spectra-bkg-inc, ufsda-inc-maps, ufsda-obs-diag, ufsda-jedi-log)
+are available in the PATH and can be run directly from any directory.
