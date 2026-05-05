@@ -125,15 +125,15 @@ Before running the diagnostics, edit the YAML files for the
 corresponding day to set:
 
 * the correct path to your experiment outputs (for example:
-  /work2/noaa/epic/CADRE2026 or your own experiment directory)
+  /path/to/CADRE-DA-training/diag-results or your own experiment directory)
 * the variables you want to diagnose (for example: T_inc, u_inc, v_inc)
 * the output directory where figures and tables will be written
 
 Typical fields to update inside each YAML include:
 
-* ``experiment.path`` or ``input.file`` entries
-* ``variables`` list
-* ``output.dir`` or ``outdir``
+* ``diagnostics``, ``zonal_mean``, ``grid``,  ``mapping``, ``increments``, ``background``, entries
+* ``variable``, ``levels``, or ``vars`` list
+* ``diag``, ``prefix``, ``outdir``,  ``output_dir``,  
 
 Day 1: Control Experiment Diagnostics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
