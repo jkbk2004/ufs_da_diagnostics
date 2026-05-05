@@ -24,14 +24,14 @@ scripts, YAML files, and experiment outputs in the same workspace.
 .. code-block:: bash
 
     cd /work2/noaa/epic/$USER
-    git clone -b feature/tutorial https://github.com/chan-hoo/CADRE-DA-training.git
-    cd CADRE-DA-training/tutorial
+    git clone https://github.com/NOAA-EPIC/CADRE-DA-training.git
+    cd CADRE-DA-training/year2_cases
 
 The job card script is located at:
 
 .. code-block:: text
 
-    tutorial/run_3dvar_hercules.sh
+    run_3dvar_hercules.sh
 
 Running the CADRE 2026 Experiments
 ----------------------------------
@@ -42,14 +42,14 @@ job card script:
 
 .. code-block:: text
 
-    https://github.com/chan-hoo/CADRE-DA-training/blob/feature/tutorial/tutorial/run_3dvar_hercules.sh
+    https://github.com/NOAA-EPIC/CADRE-DA-training/blob/main/year2_cases/run_3dvar_hercules.sh
 
 Copy the YAML configuration files for each day into your working
 directory. For example, copy the Day 1 YAMLs:
 
 .. code-block:: bash
 
-    cd /path/to/CADRE-DA-training/tutorial
+    cd /path/to/CADRE-DA-training/year2_cases
 
     cp ./input_yaml/Day1/*.yaml ./input_yaml
 
