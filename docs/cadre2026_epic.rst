@@ -22,6 +22,8 @@ The FV3-JEDI and GDASApp executables are prebuilt on Hercules. The
 training experiments for Day 1, Day 2, and Day 3 are executed using the
 job card script:
 
+.. code-block:: text
+
     https://github.com/chan-hoo/CADRE-DA-training/blob/feature/tutorial/tutorial/run_3dvar_hercules.sh
 
 Copy the YAML configuration files for each day into your working
@@ -30,7 +32,8 @@ directory. For example, copy the Day 1 YAMLs:
 .. code-block:: bash
 
     cd /path/to/CADRE-DA-training/tutorial
-    cp ./input_yaml/Day1/*.yaml ./input_yaml/
+
+    cp ./input_yaml/Day1/*.yaml ./input_yaml
 
 Submit the job card using SLURM:
 
