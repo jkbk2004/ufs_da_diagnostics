@@ -12,17 +12,8 @@ Use SSH with X11 forwarding enabled:
 
 .. code-block:: bash
 
-    ssh -X jongkim@hercules-login.hpc.msstate.edu
+    ssh -X YOUR_USERID@hercules-login.hpc.msstate.edu
 
-The diagnostics toolkit is installed at:
-
-    /work/noaa/epic/jongkim/ufs_da_diagnostics
-
-Activate the preconfigured environment:
-
-.. code-block:: bash
-
-    source /work/noaa/epic/jongkim/hercules.anaconda
 
 Running the CADRE 2026 Experiments
 ----------------------------------
@@ -38,8 +29,8 @@ directory. For example, copy the Day 1 YAMLs:
 
 .. code-block:: bash
 
-    cp /path/to/CADRE-DA-training/tutorial/input_yaml/Day1/*.yaml \
-       /work2/noaa/epic/CADRE2026/input_yaml/
+    cd /path/to/CADRE-DA-training/tutorial
+    cp ./input_yaml/Day1/*.yaml ./input_yaml/
 
 Submit the job card using SLURM:
 
@@ -57,6 +48,8 @@ Prebuilt Experiment Outputs
 ---------------------------
 
 All prebuilt CADRE 2026 experiment outputs are available at:
+
+.. code-block:: text
 
     /work2/noaa/epic/CADRE2026
 
@@ -81,6 +74,18 @@ Running Diagnostics After Jobs Complete
 Once the FV3-JEDI jobs finish, the UFS-DA Diagnostics toolkit can be
 applied to the output files. The following commands correspond to the
 Quickstart examples, adapted for the CADRE 2026 experiment structure.
+
+The diagnostics toolkit is installed at:
+
+.. code-block:: text
+
+    /work/noaa/epic/jongkim/ufs_da_diagnostics
+
+Activate the preconfigured environment:
+
+.. code-block:: bash
+
+    source /work/noaa/epic/jongkim/hercules.anaconda
 
 Day 1: Control Experiment Diagnostics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
