@@ -3,7 +3,27 @@ CADRE 2026 EPIC Session Instructions
 
 This page describes how to run the CADRE 2026 FV3-JEDI hybrid 3D-Var
 training experiments on the Hercules HPC system and how to apply the
-UFS-DA Diagnostics toolkit to the resulting outputs.
+UFS-DA Diagnostics toolkit to the resulting outputs. The three training
+days focus on complementary aspects of hybrid 3D-Var data assimilation:
+
+Day 1 — Control Experiment: System Access and Baseline Hybrid 3D-Var
+    Establishes the baseline hybrid 3D-Var “control” experiment using the
+    stand-alone FV3-JEDI job script on Hercules. Participants run the
+    analysis end-to-end, verify outputs, and create a stable reference
+    configuration for all subsequent sensitivity experiments.
+
+Day 2 — Background Error Experiments: NICAS Length Scales and Hybrid Weights
+    Focuses on SABER/BUMP background-error modeling. Participants modify
+    NICAS horizontal length scales and adjust ensemble–static hybrid
+    weights to examine how background-error parameters influence spatial
+    correlations and analysis increments, comparing results against the
+    Day 1 control.
+
+Day 3 — Observation Error Experiments: ATMS Thinning and Error Tuning
+    Explores observation-error modeling for ATMS radiances. Participants
+    experiment with Gaussian thinning and ATMS observation-error
+    inflation, evaluating impacts on QC decisions, innovation statistics,
+    and overall analysis quality across all three days.
 
 Logging Into Hercules
 ---------------------
