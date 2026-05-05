@@ -50,7 +50,6 @@ directory. For example, copy the Day 1 YAMLs:
 .. code-block:: bash
 
     cd /path/to/CADRE-DA-training/year2_cases
-
     cp ./input_yaml/Day1/*.yaml ./input_yaml
 
 Submit the job card using SLURM:
@@ -104,6 +103,7 @@ Activate the preconfigured environment:
 
 .. code-block:: bash
 
+    export MPLBACKEND=Agg
     source /work/noaa/epic/jongkim/hercules.anaconda
 
 Day 1: Control Experiment Diagnostics
