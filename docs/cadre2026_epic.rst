@@ -24,7 +24,7 @@ scripts, YAML files, and experiment outputs in the same workspace.
 .. code-block:: bash
 
     cd /work2/noaa/epic/$USER
-    git clone https://github.com/chan-hoo/CADRE-DA-training.git
+    git clone -b feature/tutorial https://github.com/chan-hoo/CADRE-DA-training.git
     cd CADRE-DA-training/tutorial
 
 The job card script is located at:
