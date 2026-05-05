@@ -80,14 +80,12 @@ Example directory listing:
 
     cadre26.8434573.day1
     cadre26.8487509.day2_hyb_wght
-    cadre26.8487556.day2_nicas
     cadre26.8487556.day2_nicas-length-scale
     cadre26.8487557.day3_thinning
-    cadre26.8487565.day3_obs_error
     cadre26.8697363_atms-err-08
     cadre26.8697429_atms-err-03
     cadre26-diagnostics
-    grid/
+    grid
 
 Running Diagnostics After Jobs Complete
 ---------------------------------------
