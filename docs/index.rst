@@ -11,6 +11,7 @@ Contents
 
     installation
     quickstart
+    cadre2026_epic
     diagnostics_overview
 
     usage_spectra

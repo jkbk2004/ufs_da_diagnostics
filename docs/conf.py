@@ -62,28 +62,25 @@ def setup(app):
     """
     pass
 
+latex_engine = 'xelatex'
+
 latex_elements = {
+    # Proper table of contents
     'tableofcontents': r'''
         \pagenumbering{roman}
         \tableofcontents
         \clearpage
         \pagenumbering{arabic}
     ''',
-}
 
-latex_engine = 'xelatex'
-
-latex_elements = {
+    # XeLaTeX does not use inputenc/fontenc
     'inputenc': '',
     'fontenc': '',
-}
 
-latex_elements = {
+    # Use TeX Gyre fonts (installed with TeX Live)
     'fontpkg': r'''
 \setmainfont{TeX Gyre Pagella}
 \setsansfont{TeX Gyre Heros}
 \setmonofont{TeX Gyre Cursor}
 ''',
 }
-
-
