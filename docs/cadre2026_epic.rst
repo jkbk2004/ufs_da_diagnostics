@@ -112,12 +112,14 @@ Prepare Diagnostics YAML Files
 Diagnostics YAML templates for all CADRE 2026 training days are already
 available under:
 
+.. code-block:: text
+
     /path/to/CADRE-DA-training/diagnostics/yamls/day1
-    /path/to/CADRE-DA-training/diagnostics/yamls/day2
-    /path/to/CADRE-DA-training/diagnostics/yamls/day3
-    /path/to/CADRE-DA-training/diagnostics/yamls/day4
-    /path/to/CADRE-DA-training/diagnostics/yamls/day5
-    /path/to/CADRE-DA-training/diagnostics/yamls/day6
+    /path/to/CADRE-DA-training/diagnostics/yamls/day2_hyb_weight
+    /path/to/CADRE-DA-training/diagnostics/yamls/day2_nicas_length_scale
+    /path/to/CADRE-DA-training/diagnostics/yamls/day3_atms_thining
+    /path/to/CADRE-DA-training/diagnostics/yamls/day3_atms_err_03
+    /path/to/CADRE-DA-training/diagnostics/yamls/day3_atms_err_08
 
 Before running the diagnostics, edit the YAML files for the
 corresponding day to set:
