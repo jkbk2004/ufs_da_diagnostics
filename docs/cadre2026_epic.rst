@@ -106,6 +106,33 @@ Activate the preconfigured environment:
     export MPLBACKEND=Agg
     source /work/noaa/epic/jongkim/hercules.anaconda
 
+Prepare Diagnostics YAML Files
+------------------------------
+
+Diagnostics YAML templates for all CADRE 2026 training days are already
+available under:
+
+    /path/to/CADRE-DA-training/diagnostics/yamls/day1
+    /path/to/CADRE-DA-training/diagnostics/yamls/day2
+    /path/to/CADRE-DA-training/diagnostics/yamls/day3
+    /path/to/CADRE-DA-training/diagnostics/yamls/day4
+    /path/to/CADRE-DA-training/diagnostics/yamls/day5
+    /path/to/CADRE-DA-training/diagnostics/yamls/day6
+
+Before running the diagnostics, edit the YAML files for the
+corresponding day to set:
+
+* the correct path to your experiment outputs (for example:
+  /work2/noaa/epic/CADRE2026 or your own experiment directory)
+* the variables you want to diagnose (for example: T_inc, u_inc, v_inc)
+* the output directory where figures and tables will be written
+
+Typical fields to update inside each YAML include:
+
+* ``experiment.path`` or ``input.file`` entries
+* ``variables`` list
+* ``output.dir`` or ``outdir``
+
 Day 1: Control Experiment Diagnostics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
