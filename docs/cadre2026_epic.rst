@@ -133,7 +133,7 @@ Typical fields to update inside each YAML include:
 
 * ``diagnostics``, ``zonal_mean``, ``grid``,  ``mapping``, ``increments``, ``background``, entries
 * ``variable``, ``levels``, or ``vars`` list
-* ``diag``, ``prefix``, ``outdir``,  ``output_dir``,  
+* ``diag``, ``prefix``, ``outdir``, or ``output_dir``  
 
 Day 1: Control Experiment Diagnostics
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
