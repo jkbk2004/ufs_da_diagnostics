@@ -14,6 +14,24 @@ Use SSH with X11 forwarding enabled:
 
     ssh -X YOUR_USERID@hercules-login.hpc.msstate.edu
 
+Clone the CADRE-DA-training Repository into Your EPIC Workspace
+---------------------------------------------------------------
+
+On Hercules, each user should clone the training repository inside their
+EPIC project directory under /work2/noaa/epic/$USER. This keeps the job
+scripts, YAML files, and experiment outputs in the same workspace.
+
+.. code-block:: bash
+
+    cd /work2/noaa/epic/$USER
+    git clone https://github.com/chan-hoo/CADRE-DA-training.git
+    cd CADRE-DA-training/tutorial
+
+The job card script is located at:
+
+.. code-block:: text
+
+    tutorial/run_3dvar_hercules.sh
 
 Running the CADRE 2026 Experiments
 ----------------------------------
